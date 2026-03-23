@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>test</title>
+    <title>廈門旅遊</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -99,10 +99,12 @@
         .airline-logo { display:flex; align-items:center; gap:8px; color: var(--color-2); }
 
         .balance-card { overflow: hidden; padding: 25px 30px 25px; position: relative; }
-        .balance-label { font-size: 14px; font-weight: 600; color: var(--color-2); letter-spacing: 1px; text-transform: uppercase;}
-        /* 總金額調降 font-weight，呈現輕盈質感 */
-        .balance-amount { font-family: var(--font-serif); font-size: 40px; margin: 10px 0; font-weight: 700; color: var(--color-1); text-shadow: none; letter-spacing: 1px; }
-        .balance-sub { font-size: 15px; font-weight: 500; color: var(--color-2); opacity: 0.8; }
+        .balance-label { font-size: 15px; font-weight: 700; color: var(--color-2); letter-spacing: 1px; display: flex; align-items: center; gap: 8px;}
+        .balance-amount { font-family: var(--font-serif); font-size: 44px; margin: 8px 0 12px; font-weight: 700; color: var(--color-1); text-shadow: none; letter-spacing: 1px; }
+        
+        /* 凸顯全體總額的樣式 */
+        .group-total-box { display: inline-block; font-size: 14px; font-weight: 600; color: var(--color-1); background: rgba(183, 143, 100, 0.15); padding: 6px 12px; border: 1px solid var(--color-1); margin-bottom: 5px;}
+        
         .rate-tag { position: absolute; top: 25px; right: 25px; font-size: 12px; background-color: var(--color-3); color: var(--color-1); padding: 5px 10px; border-radius: 0; font-weight: 600; border: var(--border-width) solid var(--color-1); }
 
         .budget-container { margin-top: 25px; padding: 18px 20px; background: rgba(183, 143, 100, 0.08); border: var(--border-width) solid var(--color-1); border-radius: 0; position: relative; z-index: 2; display: flex; flex-direction: column; gap: 10px; }
@@ -121,12 +123,9 @@
         .stat-box-val { font-size: 17px; font-weight: 700; color: var(--color-1); word-break: break-word; font-family: var(--font-serif); }
 
         .input-area { overflow: hidden; padding: 25px; }
-        .input-title { font-size: 16px; font-weight: 700; color: var(--color-1); margin-bottom: 15px; display:block; letter-spacing: 1px;}
+        .input-title { font-size: 16px; font-weight: 700; color: var(--color-1); margin-bottom: 12px; display:block; letter-spacing: 1px;}
         
-        /* 成員選擇樣式 */
-        .user-row { display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
-        .user-btn { flex: 1; min-width: 60px; text-align: center; padding: 10px 5px; border-radius: 0; background: var(--color-white); border: var(--border-width) solid var(--color-1); font-size: 14px; font-weight: 600; color: var(--color-1); cursor: pointer; transition: 0.2s; }
-        .user-btn.active { background: var(--color-1); color: var(--color-3); }
+        /* 使用者名稱標籤 */
         .user-tag { background: var(--color-4); color: var(--color-1); font-size: 11px; padding: 2px 6px; margin-right: 6px; font-weight: 700; border: 1px solid var(--color-1); vertical-align: middle; display: inline-block; line-height: 1.2;}
 
         .curr-btn-row { display: flex; border-bottom: var(--border-width) solid var(--color-1); background: var(--color-3); }
@@ -136,6 +135,7 @@
 
         .modern-input { width: 100%; padding: 14px; border: none; background: transparent; outline: none; font-size: 15px; color: var(--color-2); transition: 0.3s; font-weight: 500; border-radius: 0 !important; }
         .modern-input::placeholder { color: rgba(113, 62, 24, 0.4); font-weight: 400;}
+        .name-input { background: rgba(183, 143, 100, 0.08); font-weight: 700; color: var(--color-1); border-bottom: none;}
         
         .add-btn { width: 100%; background: var(--color-4); color: var(--color-1); padding: 16px; border-radius: 0; border: var(--border-width) solid var(--color-1); font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: 10px; letter-spacing: 1px; box-shadow: var(--box-shadow-soft); }
         .add-btn:active { transform: translateY(2px); box-shadow: none; }
@@ -220,14 +220,16 @@
     <div id="view-accounting" class="view-container active">
         <div class="balance-card">
             <div class="rate-tag" id="rate-display">固定匯率: 4.45</div>
-            <div class="balance-label">Trip Total</div>
-            <div class="balance-amount" id="total-primary">NT$ 0</div>
-            <div class="balance-sub" id="total-secondary">≈ ¥ 0</div>
+            
+            <div class="balance-label" id="balance-label-text">我的花費 <span class="user-tag" id="display-user-name" style="display:none;"></span></div>
+            <div class="balance-amount" id="my-total-primary">NT$ 0</div>
+            
+            <div class="group-total-box" id="group-total-display">全體總額: NT$ 0</div>
             
             <div class="budget-container">
-                <div class="budget-rem-row" id="budget-rem-row">剩餘：NT$ 30,000</div>
+                <div class="budget-rem-row" id="budget-rem-row">個人剩餘：NT$ 30,000</div>
                 <div class="budget-track"><div class="budget-fill" id="budget-fill"></div></div>
-                <div class="budget-tot-row">總預算：NT$ 30,000</div>
+                <div class="budget-tot-row">個人總預算：NT$ 30,000</div>
             </div>
 
             <div class="stats-grid">
@@ -251,11 +253,9 @@
         </div>
 
         <div class="input-area">
-            <span class="input-title">記帳成員：</span>
-            <div class="user-row" id="user-selection">
-                <div class="user-btn active" onclick="selectUser('成員A')">成員A</div>
-                <div class="user-btn" onclick="selectUser('成員B')">成員B</div>
-                <div class="user-btn" onclick="selectUser('成員C')">成員C</div>
+            <span class="input-title">記帳成員 (請填入你的名字)：</span>
+            <div style="border: var(--border-width) solid var(--color-1); box-shadow: var(--box-shadow-soft); margin-bottom: 25px; background: #FFFFFF;">
+                <input type="text" id="user-name-input" class="modern-input name-input" placeholder="例如：小明" oninput="updateUserName()">
             </div>
 
             <span class="input-title">新增支出至：</span>
@@ -287,7 +287,7 @@
         </div>
         
         <div class="history-list" id="expense-list">
-            <div class="loading-text">🔄 正在同步全家人的帳本...</div>
+            <div class="loading-text">🔄 正在載入資料...</div>
         </div>
     </div>
 
@@ -583,7 +583,8 @@
             } else { window.location.reload(true); }
         }
 
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVVY1EqQrjndhkeej_NIabBYYjNORHcRkaoev-wRGcWsRdO6HnvVrXg7BIIEHUYrVP/exec';
+        // 🌟 這裡已經為你替換成你提供的最新專屬測試網址囉！ 🌟
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZNDo_cJpce1DbkBFGHiwgrw6HfkcMiupInAVp5R8OnE9U4gTr9TmDgRsE5lwi-YaA1w/exec';
         
         const currentRate = 4.45; 
         
@@ -591,7 +592,7 @@
         let selectedInputDate = '4/24'; 
         let selectedCategory = '交通';
         let selectedCurrency = 'RMB'; 
-        let selectedUser = localStorage.getItem('trip_user') || '成員A'; // 新增預設成員變數
+        let selectedUser = localStorage.getItem('trip_user') || ''; // 讀取上次輸入的名字
         
         const tripDates = ['4/24', '4/25', '4/26', '4/27']; 
         
@@ -606,13 +607,22 @@
                 document.getElementById('day-selector').value = savedDay;
             } else { switchView(savedTab); }
             
+            // 初始化名字輸入框
+            document.getElementById('user-name-input').value = selectedUser;
+            
             fetchXiamenWeather(); selectDate('4/24'); fetchExpenses();
-            selectUser(selectedUser); // 初始化選擇成員
         });
+
+        // 當文字框內容改變時，即時更新主角名字並重算花費
+        function updateUserName() {
+            selectedUser = document.getElementById('user-name-input').value.trim();
+            localStorage.setItem('trip_user', selectedUser);
+            renderExpenses(); // 即時重新計算與顯示
+        }
 
         async function fetchExpenses() {
             const listEl = document.getElementById('expense-list');
-            if(expenses.length === 0) listEl.innerHTML = '<div class="loading-text">🔄 正在同步全家人的帳本...</div>';
+            if(expenses.length === 0) listEl.innerHTML = '<div class="loading-text">🔄 正在載入資料...</div>';
             try {
                 const params = new URLSearchParams({ action: 'read' });
                 const res = await fetch(`${SCRIPT_URL}?${params}`);
@@ -638,17 +648,9 @@
             }
         }
 
-        // 新增切換成員的函數
-        function selectUser(user) { 
-            selectedUser = user; 
-            localStorage.setItem('trip_user', user); 
-            document.querySelectorAll('.user-btn').forEach(btn => { 
-                btn.classList.remove('active'); 
-                if(btn.innerText === user) btn.classList.add('active'); 
-            }); 
-        }
-
         async function addExpense() {
+            if (!selectedUser) { alert('請先在上方填寫你的「記帳成員」名字！'); return; }
+            
             const nameInput = document.getElementById('item-name');
             const priceInput = document.getElementById('item-price');
             const btn = document.getElementById('btn-add');
@@ -673,7 +675,7 @@
             formData.append('cat', selectedCategory); 
             formData.append('name', finalName); 
             formData.append('price', finalPriceTWD); 
-            formData.append('user', selectedUser); // 把選擇的成員加進送出的資料中
+            formData.append('user', selectedUser); // 把你的名字送出
 
             btn.disabled = true; btn.innerText = '⏳ 儲存中...';
 
@@ -760,12 +762,14 @@
         function renderExpenses() {
             const listEl = document.getElementById('expense-list');
             listEl.innerHTML = ''; 
-            let grandTotalTWD = 0; 
-            let statsTWD = { '交通':0, '食物':0, '購物':0, '其他':0 };
+            
+            let groupTotalTWD = 0; // 全體總計
+            let myTotalTWD = 0;    // 個人總計
+            let myStatsTWD = { '交通':0, '食物':0, '購物':0, '其他':0 }; // 個人的分類統計
             
             if (!expenses || expenses.length === 0) {
                 listEl.innerHTML = '<div style="text-align:center; color:var(--color-2); padding:30px; opacity:0.6; font-weight:700;">目前沒有記帳資料<br>嘗試新增一筆吧！</div>';
-                updateStats(0, statsTWD); return;
+                updateStats(myTotalTWD, groupTotalTWD, myStatsTWD); return;
             }
 
             let hasRenderedAny = false;
@@ -789,12 +793,17 @@
                     dailyItems.forEach(item => {
                         const twdValue = Math.round(parseFloat(item.price));
                         
-                        grandTotalTWD += twdValue;
-                        if(statsTWD[item.cat] !== undefined) statsTWD[item.cat] += twdValue; else statsTWD['其他'] += twdValue;
+                        groupTotalTWD += twdValue; // 大家一起算的
+                        
+                        // 計算個人的
+                        if (item.user && item.user === selectedUser && selectedUser !== '') {
+                            myTotalTWD += twdValue;
+                            if(myStatsTWD[item.cat] !== undefined) myStatsTWD[item.cat] += twdValue; else myStatsTWD['其他'] += twdValue;
+                        }
                         
                         let rmbValue = (twdValue / currentRate).toFixed(1);
 
-                        // 加入顯示成員標籤
+                        // 歷史清單標示是誰付的
                         const userTag = item.user ? `<span class="user-tag">${item.user}</span>` : '';
 
                         const div = document.createElement('div'); div.className = 'history-item';
@@ -808,28 +817,40 @@
                 listEl.innerHTML = '<div style="text-align:center; color:var(--color-2); padding:30px; opacity:0.6; font-weight:700;">有記帳紀錄，但日期對不上<br>建議到 Google 試算表把舊資料清空！</div>';
             }
 
-            updateStats(grandTotalTWD, statsTWD);
+            updateStats(myTotalTWD, groupTotalTWD, myStatsTWD);
         }
 
-        function updateStats(totalTWD, statsTWD) {
-            let displayTotalRMB = (totalTWD / currentRate).toFixed(1);
+        function updateStats(myTotal, groupTotal, myStats) {
+            // 更新畫面上顯示的名字
+            const nameLabel = document.getElementById('display-user-name');
+            if(selectedUser) {
+                nameLabel.style.display = 'inline-block';
+                nameLabel.textContent = selectedUser;
+            } else {
+                nameLabel.style.display = 'none';
+            }
+
+            // 主要大字：我的總花費
+            document.getElementById('my-total-primary').textContent = `NT$ ${myTotal.toLocaleString()}`;
             
-            document.getElementById('total-primary').textContent = `NT$ ${totalTWD.toLocaleString()}`;
-            document.getElementById('total-secondary').textContent = `≈ ¥ ${displayTotalRMB}`;
+            // 次要標籤：全體總額
+            let groupTotalRMB = (groupTotal / currentRate).toFixed(1);
+            document.getElementById('group-total-display').textContent = `全體總額: NT$ ${groupTotal.toLocaleString()} (≈ ¥ ${groupTotalRMB})`;
             
+            // 個人預算進度條 (預設設定 3萬是個人預算)
             const TOTAL_BUDGET = 30000;
-            let remaining = TOTAL_BUDGET - totalTWD;
-            let spentPercent = Math.min(100, Math.max(0, (totalTWD / TOTAL_BUDGET) * 100));
+            let remaining = TOTAL_BUDGET - myTotal;
+            let spentPercent = Math.min(100, Math.max(0, (myTotal / TOTAL_BUDGET) * 100));
             
             const budgetRemRow = document.getElementById('budget-rem-row');
             const budgetFill = document.getElementById('budget-fill');
             
             if (remaining < 0) {
-                budgetRemRow.textContent = `超支：NT$ ${Math.abs(remaining).toLocaleString()}`;
+                budgetRemRow.textContent = `個人超支：NT$ ${Math.abs(remaining).toLocaleString()}`;
                 budgetRemRow.classList.add('danger-text');
                 budgetFill.classList.add('danger-bg');
             } else {
-                budgetRemRow.textContent = `剩餘：NT$ ${remaining.toLocaleString()}`;
+                budgetRemRow.textContent = `個人剩餘：NT$ ${remaining.toLocaleString()}`;
                 budgetRemRow.classList.remove('danger-text');
                 
                 if (spentPercent >= 80) {
@@ -839,13 +860,13 @@
                     budgetFill.classList.remove('danger-bg');
                 }
             }
-            
             budgetFill.style.width = `${spentPercent}%`;
 
-            document.getElementById('stat-transport').textContent = `NT$ ${statsTWD['交通'].toLocaleString()}`;
-            document.getElementById('stat-food').textContent = `NT$ ${statsTWD['食物'].toLocaleString()}`;
-            document.getElementById('stat-shopping').textContent = `NT$ ${statsTWD['購物'].toLocaleString()}`;
-            document.getElementById('stat-other').textContent = `NT$ ${statsTWD['其他'].toLocaleString()}`;
+            // 分類統計：只顯示個人的
+            document.getElementById('stat-transport').textContent = `NT$ ${myStats['交通'].toLocaleString()}`;
+            document.getElementById('stat-food').textContent = `NT$ ${myStats['食物'].toLocaleString()}`;
+            document.getElementById('stat-shopping').textContent = `NT$ ${myStats['購物'].toLocaleString()}`;
+            document.getElementById('stat-other').textContent = `NT$ ${myStats['其他'].toLocaleString()}`;
         }
 
         function getCatEmoji(cat) { return (cat==='交通'?'🚕':(cat==='食物'?'🍔':(cat==='購物'?'🛍️':'✨'))); }
