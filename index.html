@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>廈門旅遊</title>
+    <title>test</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -219,7 +219,7 @@
 
     <div id="view-accounting" class="view-container active">
         <div class="balance-card">
-            <div class="rate-tag" id="rate-display">固定匯率: 4.45</div>
+            <div class="rate-tag" id="rate-display">匯率載入中...</div>
             
             <div class="balance-label" id="balance-label-text">我的花費 <span class="user-tag" id="display-user-name" style="display:none;"></span></div>
             <div class="balance-amount" id="my-total-primary">NT$ 0</div>
@@ -583,16 +583,16 @@
             } else { window.location.reload(true); }
         }
 
-        // 🌟 這裡已經為你替換成你提供的最新專屬測試網址囉！ 🌟
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZNDo_cJpce1DbkBFGHiwgrw6HfkcMiupInAVp5R8OnE9U4gTr9TmDgRsE5lwi-YaA1w/exec';
         
-        const currentRate = 4.45; 
+        // 🌟 改為 let 變數，預設 4.45，等下抓到新匯率就會覆蓋掉 🌟
+        let currentRate = 4.45; 
         
         let expenses = []; 
         let selectedInputDate = '4/24'; 
         let selectedCategory = '交通';
         let selectedCurrency = 'RMB'; 
-        let selectedUser = localStorage.getItem('trip_user') || ''; // 讀取上次輸入的名字
+        let selectedUser = localStorage.getItem('trip_user') || ''; 
         
         const tripDates = ['4/24', '4/25', '4/26', '4/27']; 
         
@@ -607,17 +607,36 @@
                 document.getElementById('day-selector').value = savedDay;
             } else { switchView(savedTab); }
             
-            // 初始化名字輸入框
             document.getElementById('user-name-input').value = selectedUser;
             
-            fetchXiamenWeather(); selectDate('4/24'); fetchExpenses();
+            // 🌟 網頁開啟時，同時抓取天氣、匯率和記帳資料 🌟
+            fetchXiamenWeather(); 
+            fetchExchangeRate(); 
+            selectDate('4/24'); 
+            fetchExpenses();
         });
 
-        // 當文字框內容改變時，即時更新主角名字並重算花費
+        // 🌟 新增抓取即時匯率的功能 🌟
+        async function fetchExchangeRate() {
+            try {
+                const res = await fetch('https://open.er-api.com/v6/latest/CNY');
+                const data = await res.json();
+                if (data && data.rates && data.rates.TWD) {
+                    currentRate = data.rates.TWD;
+                    document.getElementById('rate-display').innerText = `即時匯率: ${currentRate.toFixed(2)}`;
+                    // 如果這時候資料已經載入好了，就重新算一次讓畫面上的 ¥ 跟著變動
+                    if(expenses.length > 0) renderExpenses();
+                }
+            } catch (err) {
+                console.error('匯率載入失敗', err);
+                document.getElementById('rate-display').innerText = `預設匯率: ${currentRate}`;
+            }
+        }
+
         function updateUserName() {
             selectedUser = document.getElementById('user-name-input').value.trim();
             localStorage.setItem('trip_user', selectedUser);
-            renderExpenses(); // 即時重新計算與顯示
+            renderExpenses(); 
         }
 
         async function fetchExpenses() {
@@ -663,6 +682,7 @@
             let finalPriceTWD; 
 
             if (selectedCurrency === 'RMB') {
+                // 用最新的匯率算出台幣存進去
                 finalPriceTWD = Math.round(inputPrice * currentRate); 
             } else {
                 finalPriceTWD = Math.round(inputPrice); 
@@ -675,7 +695,7 @@
             formData.append('cat', selectedCategory); 
             formData.append('name', finalName); 
             formData.append('price', finalPriceTWD); 
-            formData.append('user', selectedUser); // 把你的名字送出
+            formData.append('user', selectedUser); 
 
             btn.disabled = true; btn.innerText = '⏳ 儲存中...';
 
@@ -763,9 +783,9 @@
             const listEl = document.getElementById('expense-list');
             listEl.innerHTML = ''; 
             
-            let groupTotalTWD = 0; // 全體總計
-            let myTotalTWD = 0;    // 個人總計
-            let myStatsTWD = { '交通':0, '食物':0, '購物':0, '其他':0 }; // 個人的分類統計
+            let groupTotalTWD = 0; 
+            let myTotalTWD = 0;    
+            let myStatsTWD = { '交通':0, '食物':0, '購物':0, '其他':0 }; 
             
             if (!expenses || expenses.length === 0) {
                 listEl.innerHTML = '<div style="text-align:center; color:var(--color-2); padding:30px; opacity:0.6; font-weight:700;">目前沒有記帳資料<br>嘗試新增一筆吧！</div>';
@@ -793,17 +813,16 @@
                     dailyItems.forEach(item => {
                         const twdValue = Math.round(parseFloat(item.price));
                         
-                        groupTotalTWD += twdValue; // 大家一起算的
+                        groupTotalTWD += twdValue; 
                         
-                        // 計算個人的
                         if (item.user && item.user === selectedUser && selectedUser !== '') {
                             myTotalTWD += twdValue;
                             if(myStatsTWD[item.cat] !== undefined) myStatsTWD[item.cat] += twdValue; else myStatsTWD['其他'] += twdValue;
                         }
                         
+                        // 這裡畫面上的人民幣金額，會因為抓到了即時匯率而動態變更
                         let rmbValue = (twdValue / currentRate).toFixed(1);
 
-                        // 歷史清單標示是誰付的
                         const userTag = item.user ? `<span class="user-tag">${item.user}</span>` : '';
 
                         const div = document.createElement('div'); div.className = 'history-item';
@@ -821,7 +840,6 @@
         }
 
         function updateStats(myTotal, groupTotal, myStats) {
-            // 更新畫面上顯示的名字
             const nameLabel = document.getElementById('display-user-name');
             if(selectedUser) {
                 nameLabel.style.display = 'inline-block';
@@ -830,14 +848,12 @@
                 nameLabel.style.display = 'none';
             }
 
-            // 主要大字：我的總花費
             document.getElementById('my-total-primary').textContent = `NT$ ${myTotal.toLocaleString()}`;
             
-            // 次要標籤：全體總額
+            // 全體總額的人民幣換算也會吃即時匯率
             let groupTotalRMB = (groupTotal / currentRate).toFixed(1);
             document.getElementById('group-total-display').textContent = `全體總額: NT$ ${groupTotal.toLocaleString()} (≈ ¥ ${groupTotalRMB})`;
             
-            // 個人預算進度條 (預設設定 3萬是個人預算)
             const TOTAL_BUDGET = 30000;
             let remaining = TOTAL_BUDGET - myTotal;
             let spentPercent = Math.min(100, Math.max(0, (myTotal / TOTAL_BUDGET) * 100));
@@ -862,7 +878,6 @@
             }
             budgetFill.style.width = `${spentPercent}%`;
 
-            // 分類統計：只顯示個人的
             document.getElementById('stat-transport').textContent = `NT$ ${myStats['交通'].toLocaleString()}`;
             document.getElementById('stat-food').textContent = `NT$ ${myStats['食物'].toLocaleString()}`;
             document.getElementById('stat-shopping').textContent = `NT$ ${myStats['購物'].toLocaleString()}`;
