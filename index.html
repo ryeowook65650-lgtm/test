@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>廈門旅遊</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#d8d8d0">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* --- 大地清爽配色 --- */
+            --color-1: #382615; /* 深咖啡：主文字、細邊框 */
+            --color-2: #713e18; /* 暖焦糖：次要文字、標題 */
+            --color-3: #d8d8d0; /* 淺灰杏：主背景 */
+            --color-4: #f4c07d; /* 柔和橘：強調色、按鈕 */
+            --color-5: #b78f64; /* 淺拿鐵：輔助底色 */
+            --color-white: #FCFAFA; /* 柔和白：卡片底色 */
+
+            --font-serif: "Noto Serif TC", "Georgia", serif;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+            
+            /* --- 日雜風核心：極細線條與輕柔陰影 --- */
+            --border-width: 1px; 
+            --box-shadow-soft: 0 4px 15px rgba(56, 38, 21, 0.06); 
+        }
+
+        /* 保持銳利直角，不使用圓角，呈現雜誌排版的俐落感 */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; border-radius: 0 !important; }
+        
+        body { 
+            margin: 0; padding: 0; 
+            font-family: var(--font-sans);
+            background-color: var(--color-3); /* 無格子的純淨底色 */
+            color: var(--color-1);
+            padding-bottom: 60px;
+            letter-spacing: 0.02em; /* 增加字元間距，提升呼吸感 */
+        }
+
+        .top-bar { position: sticky; top: 0; z-index: 999; background-color: var(--color-3); border-bottom: var(--border-width) solid var(--color-1); padding-top: env(safe-area-inset-top); }
+        .header-info { padding: 25px 20px 15px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* 標題改為精緻的襯線體，適當粗度 (700) */
+        .app-title { font-family: var(--font-serif); font-size: 24px; font-weight: 700; letter-spacing: 2px; color: var(--color-1); text-shadow: none; display: flex; align-items: center; line-height: 1; }
+        .refresh-btn { font-size: 18px; cursor: pointer; transition: transform 0.3s ease; margin-left: 8px; display: inline-block; opacity: 0.8;}
+        .refresh-btn:active { transform: rotate(180deg); }
+        
+        .weather-badge { font-size: 13px; font-weight: 600; color: var(--color-1); background: var(--color-4); padding: 7px 12px; border-radius: 0; text-decoration: none; border: var(--border-width) solid var(--color-1); cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 8px rgba(244, 192, 125, 0.3); }
+        .weather-badge:active { transform: translateY(1px); box-shadow: none; }
+
+        .nav-bar-row { display: flex; align-items: center; padding: 5px 20px 25px; gap: 12px; background-color: var(--color-3); }
+        
+        /* 導覽按鈕字重調降至 600，線條 1px */
+        .nav-btn, .nav-select { display: block; width: 100%; text-align: center; padding: 12px 0; font-size: 14px; font-weight: 600; color: var(--color-1); cursor: pointer; position: relative; transition: 0.2s; background: var(--color-3); border: var(--border-width) solid var(--color-1); border-radius: 0; appearance: none; -webkit-appearance: none; outline: none; font-family: var(--font-sans); }
+        .nav-btn { flex: 1; white-space: nowrap; }
+        .nav-select-wrapper { flex: 1.45; position: relative; }
+        .nav-select-wrapper::after { content: '▼'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 10px; color: var(--color-1); pointer-events: none; transition: 0.2s; z-index: 2; }
+        .nav-select { padding: 12px 10px; text-align: left; }
+        
+        .nav-btn.active, .nav-select-wrapper.active .nav-select { background-color: var(--color-1); color: var(--color-3); box-shadow: var(--box-shadow-soft); }
+        .nav-select-wrapper::after { color: var(--color-1); }
+        .nav-select-wrapper.active::after { color: var(--color-3); }
+
+        .view-container { display: none; padding: 25px 20px; max-width: 600px; margin: 0 auto; }
+        .view-container.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 卡片配置不變，僅將邊框變極細 1px，陰影變輕柔 */
+        .retro-card, .flight-ticket, .balance-card, .input-area, .trip-card { background-color: var(--color-white); border-radius: 0; border: var(--border-width) solid var(--color-1); box-shadow: var(--box-shadow-soft); color: var(--color-2); margin-bottom: 25px;}
+        
+        .flight-ticket { position: relative; }
+        .flight-ticket::before, .flight-ticket::after { content: ''; position: absolute; top: 135px; width: 12px; height: 24px; background-color: var(--color-3); z-index: 2; border: var(--border-width) solid var(--color-1); box-sizing: border-box; }
+        .flight-ticket::before { left: -1px; border-radius: 0; border-left: none; }
+        .flight-ticket::after { right: -1px; border-radius: 0; border-right: none; }
+        
+        .ticket-header { padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: var(--border-width) solid var(--color-1); border-radius: 0; }
+        .ticket-header.outbound { background: rgba(183, 143, 100, 0.15); }
+        .ticket-header.inbound { background: rgba(244, 192, 125, 0.15); }
+        .ticket-label { font-family: var(--font-serif); font-size: 16px; font-weight: 700; color: var(--color-1); letter-spacing: 1px;}
+        .ticket-date { font-weight: 600; font-size: 14px; color: var(--color-2); }
+        .ticket-body { padding: 25px; position: relative; border-radius: 0; }
+        .route-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .airport-code { font-size: 32px; font-weight: 700; line-height: 1; color: var(--color-1); font-family: var(--font-serif); }
+        .airport-name { font-size: 13px; font-weight: 500; display: block; margin-top: 8px; opacity: 0.8; }
+        .flight-icon { font-size: 24px; color: var(--color-5); opacity: 0.6; }
+        .time-row { display: flex; justify-content: space-between; border-top: var(--border-width) solid var(--color-1); padding-top: 20px; margin-top: 15px; }
+        .time-col { flex: 1; }
+        .time-val { font-size: 22px; font-weight: 700; color: var(--color-1); font-family: var(--font-serif); }
+        .time-lbl { font-size: 11px; font-weight: 600; margin-bottom: 4px; display: block; opacity: 0.5; letter-spacing: 1px;}
+        .flight-info-row { margin-top: 20px; background: var(--color-white); padding: 12px 15px; border-radius: 0; display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; border: var(--border-width) solid var(--color-1); }
+        .airline-logo { display:flex; align-items:center; gap:8px; color: var(--color-2); }
+
+        .balance-card { overflow: hidden; padding: 25px 30px 25px; position: relative; }
+        .balance-label { font-size: 14px; font-weight: 600; color: var(--color-2); letter-spacing: 1px; text-transform: uppercase;}
+        /* 總金額調降 font-weight，呈現輕盈質感 */
+        .balance-amount { font-family: var(--font-serif); font-size: 40px; margin: 10px 0; font-weight: 700; color: var(--color-1); text-shadow: none; letter-spacing: 1px; }
+        .balance-sub { font-size: 15px; font-weight: 500; color: var(--color-2); opacity: 0.8; }
+        .rate-tag { position: absolute; top: 25px; right: 25px; font-size: 12px; background-color: var(--color-3); color: var(--color-1); padding: 5px 10px; border-radius: 0; font-weight: 600; border: var(--border-width) solid var(--color-1); }
+
+        .budget-container { margin-top: 25px; padding: 18px 20px; background: rgba(183, 143, 100, 0.08); border: var(--border-width) solid var(--color-1); border-radius: 0; position: relative; z-index: 2; display: flex; flex-direction: column; gap: 10px; }
+        .budget-rem-row { text-align: left; font-size: 20px; font-weight: 700; color: var(--color-1); line-height: 1; transition: 0.3s; font-family: var(--font-serif); }
+        .budget-track { height: 10px; width: 100%; border: var(--border-width) solid var(--color-1); border-radius: 0; background: #FFFFFF; overflow: hidden; }
+        .budget-fill { height: 100%; width: 0%; background-color: var(--color-1); transition: width 0.5s; }
+        .budget-tot-row { text-align: left; font-size: 13px; font-weight: 500; color: var(--color-2); opacity: 0.8; line-height: 1; }
+        
+        .danger-text { color: #A04000 !important; }
+        .danger-bg { background-color: #A04000 !important; }
+
+        /* 2x2 Bento Box 排版完全不變，僅微調線條 */
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 25px; }
+        .stat-box { background: var(--color-white); border: var(--border-width) solid var(--color-1); padding: 12px 15px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+        .stat-box-title { font-size: 13px; font-weight: 600; color: var(--color-2); display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .stat-box-val { font-size: 17px; font-weight: 700; color: var(--color-1); word-break: break-word; font-family: var(--font-serif); }
+
+        .input-area { overflow: hidden; padding: 25px; }
+        .input-title { font-size: 16px; font-weight: 700; color: var(--color-1); margin-bottom: 15px; display:block; letter-spacing: 1px;}
+        
+        /* 成員選擇樣式 */
+        .user-row { display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
+        .user-btn { flex: 1; min-width: 60px; text-align: center; padding: 10px 5px; border-radius: 0; background: var(--color-white); border: var(--border-width) solid var(--color-1); font-size: 14px; font-weight: 600; color: var(--color-1); cursor: pointer; transition: 0.2s; }
+        .user-btn.active { background: var(--color-1); color: var(--color-3); }
+        .user-tag { background: var(--color-4); color: var(--color-1); font-size: 11px; padding: 2px 6px; margin-right: 6px; font-weight: 700; border: 1px solid var(--color-1); vertical-align: middle; display: inline-block; line-height: 1.2;}
+
+        .curr-btn-row { display: flex; border-bottom: var(--border-width) solid var(--color-1); background: var(--color-3); }
+        .curr-btn { flex: 1; text-align: center; padding: 12px; font-size: 14px; font-weight: 600; color: var(--color-1); cursor: pointer; transition: 0.2s; border-right: var(--border-width) solid var(--color-1); }
+        .curr-btn:last-child { border-right: none; }
+        .curr-btn.active { background: var(--color-1); color: var(--color-3); }
+
+        .modern-input { width: 100%; padding: 14px; border: none; background: transparent; outline: none; font-size: 15px; color: var(--color-2); transition: 0.3s; font-weight: 500; border-radius: 0 !important; }
+        .modern-input::placeholder { color: rgba(113, 62, 24, 0.4); font-weight: 400;}
+        
+        .add-btn { width: 100%; background: var(--color-4); color: var(--color-1); padding: 16px; border-radius: 0; border: var(--border-width) solid var(--color-1); font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: 10px; letter-spacing: 1px; box-shadow: var(--box-shadow-soft); }
+        .add-btn:active { transform: translateY(2px); box-shadow: none; }
+        .add-btn:disabled { background: var(--color-3); border-color: var(--color-1); color: var(--color-5); box-shadow: none; cursor: not-allowed; }
+
+        .history-list { margin-top: 15px; padding-bottom: 20px; }
+        .date-divider { font-family: var(--font-serif); font-size: 20px; color: var(--color-1); font-weight: 700; margin: 35px 0 15px 10px; text-shadow: none; border-bottom: var(--border-width) solid var(--color-border); padding-bottom: 5px; display: inline-block; }
+        
+        .history-item { display: flex; justify-content: space-between; align-items: center; background: var(--color-white); padding: 18px; border-radius: 0; margin-bottom: 12px; border: var(--border-width) solid var(--color-1); box-shadow: var(--box-shadow-soft); }
+        .h-name { font-weight: 600; font-size: 15px; color: var(--color-1); }
+        .h-cat { font-size: 12px; color: var(--color-2); opacity: 0.8; font-weight: 500; margin-top: 4px;}
+        .h-price { font-weight: 700; font-size: 17px; color: var(--color-1); font-family: var(--font-serif); }
+        .h-twd { font-size: 12px; color: var(--color-2); display: block; font-weight: 500; margin-top: 3px;}
+        .del-btn { color: var(--color-5); font-weight: 500; background: none; border: none; font-size: 22px; padding-left: 15px; cursor: pointer; transition: 0.2s;}
+        .del-btn:hover { color: #A04000; }
+        
+        .loading-text { text-align: center; padding: 20px; font-size: 14px; font-weight: 500; color: var(--color-2); opacity: 0.8; }
+
+        .date-scroll-container { overflow-x: auto; white-space: nowrap; padding: 5px 5px 20px; scrollbar-width: none; }
+        .date-chip { display: inline-block; background: var(--color-white); border: var(--border-width) solid var(--color-1); padding: 8px 16px; border-radius: 0; margin-right: 10px; font-size: 14px; font-weight: 600; color: var(--color-1); cursor: pointer; transition: 0.2s; }
+        .date-chip.active { background: var(--color-1); color: var(--color-3); }
+
+        .cat-row { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
+        .cat-btn { flex: 1; min-width: 75px; text-align: center; padding: 12px 5px; border-radius: 0; background: var(--color-white); border: var(--border-width) solid var(--color-1); font-size: 13px; font-weight: 600; color: var(--color-1); cursor: pointer; transition: 0.2s; }
+        .cat-btn.active { background: var(--color-1); color: var(--color-3); }
+        .cat-emoji { font-size: 20px; display: block; margin-bottom: 6px; }
+
+        .day-schedule { display: none; animation: fadeIn 0.3s ease; }
+        .day-schedule.active { display: block; }
+        .timeline { position: relative; padding-left: 20px; padding-top: 15px; }
+        .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 1px; background: var(--color-1); opacity: 0.3; } /* 細時間軸 */
+        .day-header { font-family: var(--font-serif); font-size: 24px; color: var(--color-1); margin-bottom: 25px; padding-left: 15px; font-weight: 700; text-shadow: none; border-bottom: 1px solid var(--color-border); padding-bottom: 10px;}
+        
+        .trip-card { overflow: hidden; margin-bottom: 35px; position: relative; }
+        /* 時間軸小圓點也改細緻 */
+        .trip-card::after { content: ''; position: absolute; left: -16px; top: 28px; width: 10px; height: 10px; border-radius: 50% !important; background-color: var(--color-3); border: var(--border-width) solid var(--color-1); z-index: 1; }
+        .card-img-top { width: 100%; height: 200px; object-fit: cover; display: block; border-bottom: var(--border-width) solid var(--color-1); }
+        .card-content { padding: 25px; }
+        .t-time { font-size: 13px; font-weight: 600; color: var(--color-2); margin-bottom: 12px; display: inline-block; padding-bottom: 4px; border-bottom: 1px solid var(--color-5); font-family: var(--font-sans); letter-spacing: 1px; }
+        .t-title { font-family: var(--font-serif); font-size: 22px; font-weight: 700; margin-bottom: 18px; line-height: 1.35; color: var(--color-1); }
+        .info-block { display: flex; gap: 12px; margin-bottom: 15px; font-size: 14px; align-items: flex-start; }
+        .i-icon { color: var(--color-5); width: 24px; text-align: center; font-size: 18px; line-height: 1.4; }
+        .i-text { flex: 1; line-height: 1.6; font-weight: 500; color: var(--color-1); }
+        
+        .cost-tag { display: inline-block; background-color: transparent; color: var(--color-2); padding: 4px 8px; font-size: 13px; font-weight: 600; border: var(--border-width) dashed var(--color-5); margin-top: 6px; font-family: var(--font-sans); }
+        
+        .subway-step { display: block; margin-bottom: 6px; border-left: 1px solid var(--color-5); padding-left: 10px;}
+        .subway-station { font-weight: 700; font-size: 15px; color: var(--color-1); }
+        .subway-line { color: var(--color-2); font-weight: 600; font-size: 13px;}
+
+        .map-link { display: flex; align-items: center; justify-content: center; background: var(--color-3); color: var(--color-1); text-decoration: none; padding: 14px; margin-top: 25px; font-size: 14px; font-weight: 700; gap: 8px; border: var(--border-width) solid var(--color-1); transition: 0.2s; box-shadow: var(--box-shadow-soft); letter-spacing: 1px;}
+        .map-link:active { transform: translateY(2px); box-shadow: none; }
+        .copy-btn { background: none; border: none; cursor: pointer; font-size: 14px; margin-left: 5px; color: var(--color-5); padding: 0; transition: 0.2s; }
+        .copy-btn:active { transform: scale(0.9); }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="header-info">
+            <div class="app-title">廈門旅遊 <span class="refresh-btn" onclick="forceAppUpdate()">🔄</span></div>
+            <div id="weather-badge" class="weather-badge" onclick="fetchXiamenWeather()">
+                🇨🇳 載入天氣...
+            </div>
+        </div>
+        
+        <div class="nav-bar-row">
+            <button class="nav-btn" id="btn-flight" onclick="switchView('flight')">航班資訊</button>
+            <button class="nav-btn active" id="btn-accounting" onclick="switchView('accounting')">支出紀錄</button>
+            <div class="nav-select-wrapper" id="wrapper-itinerary">
+                <select class="nav-select" id="day-selector" onchange="switchView('itinerary', this.value)">
+                    <option value="" disabled selected>行程一覽 ▾</option>
+                    <option value="day1">Day 1 (4/24 五)</option>
+                    <option value="day2">Day 2 (4/25 六)</option>
+                    <option value="day3">Day 3 (4/26 日)</option>
+                    <option value="day4">Day 4 (4/27 一)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-accounting" class="view-container active">
+        <div class="balance-card">
+            <div class="rate-tag" id="rate-display">固定匯率: 4.45</div>
+            <div class="balance-label">Trip Total</div>
+            <div class="balance-amount" id="total-primary">NT$ 0</div>
+            <div class="balance-sub" id="total-secondary">≈ ¥ 0</div>
+            
+            <div class="budget-container">
+                <div class="budget-rem-row" id="budget-rem-row">剩餘：NT$ 30,000</div>
+                <div class="budget-track"><div class="budget-fill" id="budget-fill"></div></div>
+                <div class="budget-tot-row">總預算：NT$ 30,000</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-box-title"><span>🚕</span> 交通</div>
+                    <div class="stat-box-val" id="stat-transport">NT$ 0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-title"><span>🍔</span> 食物</div>
+                    <div class="stat-box-val" id="stat-food">NT$ 0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-title"><span>🛍️</span> 購物</div>
+                    <div class="stat-box-val" id="stat-shopping">NT$ 0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-title"><span>✨</span> 其他</div>
+                    <div class="stat-box-val" id="stat-other">NT$ 0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <span class="input-title">記帳成員：</span>
+            <div class="user-row" id="user-selection">
+                <div class="user-btn active" onclick="selectUser('成員A')">成員A</div>
+                <div class="user-btn" onclick="selectUser('成員B')">成員B</div>
+                <div class="user-btn" onclick="selectUser('成員C')">成員C</div>
+            </div>
+
+            <span class="input-title">新增支出至：</span>
+            <div class="date-scroll-container">
+                <div class="date-chip active" onclick="selectDate('4/24')">4/24</div>
+                <div class="date-chip" onclick="selectDate('4/25')">4/25</div>
+                <div class="date-chip" onclick="selectDate('4/26')">4/26</div>
+                <div class="date-chip" onclick="selectDate('4/27')">4/27</div>
+            </div>
+            <div class="cat-row">
+                <div class="cat-btn active" onclick="selectCategory('交通')"><span class="cat-emoji">🚕</span>交通</div>
+                <div class="cat-btn" onclick="selectCategory('食物')"><span class="cat-emoji">🍔</span>食物</div>
+                <div class="cat-btn" onclick="selectCategory('購物')"><span class="cat-emoji">🛍️</span>購物</div>
+                <div class="cat-btn" onclick="selectCategory('其他')"><span class="cat-emoji">✨</span>其他</div>
+            </div>
+            
+            <div style="border: var(--border-width) solid var(--color-1); box-shadow: var(--box-shadow-soft); margin-bottom: 15px; background: #FFFFFF;">
+                <input type="text" id="item-name" class="modern-input" placeholder="細項名稱 (空白則自動填入分類)" style="border-bottom: var(--border-width) solid var(--color-1);">
+                
+                <div class="curr-btn-row">
+                    <div id="btn-curr-rmb" class="curr-btn active" onclick="selectCurrency('RMB')">¥ 人民幣</div>
+                    <div id="btn-curr-twd" class="curr-btn" onclick="selectCurrency('TWD')">$ 台幣</div>
+                </div>
+                
+                <input type="number" id="item-price" class="modern-input" placeholder="輸入金額 (¥)">
+            </div>
+            
+            <button onclick="addExpense()" id="btn-add" class="add-btn">確認新增 (至 <span id="btn-date-label">4/24</span>)</button>
+        </div>
+        
+        <div class="history-list" id="expense-list">
+            <div class="loading-text">🔄 正在同步全家人的帳本...</div>
+        </div>
+    </div>
+
+    <div id="view-flight" class="view-container">
+        <div class="flight-ticket">
+            <div class="ticket-header outbound">
+                <div class="ticket-label">Outbound 去程</div>
+                <div class="ticket-date">2026/4/24 (五)</div>
+            </div>
+            <div class="ticket-body">
+                <div class="route-row">
+                    <div><span class="airport-code">TPE</span><span class="airport-name">台北桃園</span></div>
+                    <div class="flight-icon">✈</div>
+                    <div style="text-align:right;"><span class="airport-code">XMN</span><span class="airport-name">廈門高崎</span></div>
+                </div>
+                <div class="time-row">
+                    <div class="time-col"><span class="time-lbl">DEPARTURE</span><span class="time-val">08:40</span></div>
+                    <div class="time-col" style="text-align:right;"><span class="time-lbl">ARRIVAL</span><span class="time-val">10:30</span></div>
+                </div>
+                <div class="flight-info-row">
+                    <div class="airline-logo">MANDARIN AIRLINES AE991</div>
+                    <div>1h 50m</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flight-ticket">
+            <div class="ticket-header inbound">
+                <div class="ticket-label">Inbound 回程</div>
+                <div class="ticket-date">2026/4/27 (一)</div>
+            </div>
+            <div class="ticket-body">
+                <div class="route-row">
+                    <div><span class="airport-code">XMN</span><span class="airport-name">廈門高崎</span></div>
+                    <div class="flight-icon">✈</div>
+                    <div style="text-align:right;"><span class="airport-code">TPE</span><span class="airport-name">台北桃園</span></div>
+                </div>
+                <div class="time-row">
+                    <div class="time-col"><span class="time-lbl">DEPARTURE</span><span class="time-val">11:40</span></div>
+                    <div class="time-col" style="text-align:right;"><span class="time-lbl">ARRIVAL</span><span class="time-val">13:30</span></div>
+                </div>
+                <div class="flight-info-row">
+                    <div class="airline-logo">MANDARIN AIRLINES AE992</div>
+                    <div>1h 50m</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-itinerary" class="view-container">
+        <div id="day1-content" class="day-schedule">
+            <div class="day-header">Day 1 • 4/24 (五)</div>
+            <div class="timeline">
+                <div class="trip-card">
+                    <img src="https://content.skyscnr.com/available/2306062384/2306062384_WxH.jpg" loading="lazy" class="card-img-top" alt="Hotel Check-in">
+                    <div class="card-content">
+                        <div class="t-time">車程預估 20 分鐘</div>
+                        <div class="t-title">Check in: 廈門瑞頤大酒店</div>
+                        <div class="info-block"><div class="i-icon">📍</div><div class="i-text">廈門市思明區鷺江道12號 <button class="copy-btn" onclick="copyToClipboard('廈門市思明區鷺江道12號')">📋</button></div></div>
+                        <div class="info-block">
+                            <div class="i-icon">🚕</div>
+                            <div class="i-text">搭乘 包車<br><span class="cost-tag">交通花費：¥50</span></div>
+                        </div>
+                        <div class="info-block"><div class="i-icon">💡</div><div class="i-text">先寄放行李</div></div>
+                        <a href="https://j.map.baidu.com/36/PoJ" target="_blank" class="map-link">開啟 百度地圖 ↗</a>
+                    </div>
+                </div>
+                
+                <div class="trip-card">
+                    <img src="https://g.udn.com.tw/upfiles/B_VI/visa520infinite/PSN_PHOTO/321/f_29304321_1.jpg" loading="lazy" class="card-img-top" alt="Buffet">
+                    <div class="card-content">
+                        <div class="t-time">車程預估 35 分鐘</div>
+                        <div class="t-title">漁緯港海鮮自助餐廳<br><span style="font-size: 15px; font-family: var(--font-sans); font-weight:500; display:block; margin-top:6px;">(SM廈門-3期)</span></div>
+                        <div class="info-block"><div class="i-icon">📍</div><div class="i-text">廈門市湖里區嘉禾路399號SM商業城3期4層 <button class="copy-btn" onclick="copyToClipboard('廈門市湖里區嘉禾路399號SM商業城3期4層')">📋</button></div></div>
+                        <div class="info-block">
+                            <div class="i-icon">🚇</div>
+                            <div class="i-text">
+                                <span class="subway-step">步行到 <span class="subway-station">鎮海路站</span></span>
+                                <span class="subway-step">搭乘 <span class="subway-line">地鐵1號線（往岩內方向）</span></span>
+                                <span class="subway-step">搭到 <span class="subway-station">烏石浦站</span> 3B出口</span>
+                                <span class="cost-tag">交通花費：¥3</span>
+                            </div>
+                        </div>
+                        <div class="info-block"><div class="i-icon">💡</div><div class="i-text">這期有無印良品，吃完buffet逛百貨公司</div></div>
+                        <a href="https://j.map.baidu.com/24/LZQd" target="_blank" class="map-link">開啟 百度地圖 ↗</a>
+                    </div>
+                </div>
+                
+                <div class="trip-card">
+                    <img src="https://content.skyscnr.com/available/2306062384/2306062384_WxH.jpg" loading="lazy" class="card-img-top" alt="Return Hotel">
+                    <div class="card-content">
+                        <div class="t-time">車程預估 25 分鐘</div>
+                        <div class="t-title">回飯店: 廈門瑞頤大酒店</div>
+                        <div class="info-block"><div class="i-icon">📍</div><div class="i-text">廈門市思明區鷺江道12號 <button class="copy-btn" onclick="copyToClipboard('廈門市思明區鷺江道12號')">📋</button></div></div>
+                        <div class="info-block">
+                            <div class="i-icon">🚕</div>
+                            <div class="i-text">搭乘 計程車<br><span class="cost-tag">交通花費：¥28</span></div>
+                        </div>
+                        <a href="https://j.map.baidu.com/36/PoJ" target="_blank" class="map-link">開啟 百度地圖 ↗</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="day2-content" class="day-schedule">
+            <div class="day-header">Day 2 • 4/25 (六)</div>
+            <div class="timeline">
+                <div class="trip-card">
+                    <img src="https://dimg04.c-ctrip.com/images/1lo6t12000c35o4p52F69_R_1000_500.png_.webp?proc=namelogo/d_5" loading="lazy" class="card-img-top" alt="Sightseeing">
+                    <div class="card-content">
+                        <div class="t-time">車程預估 12 分鐘</div>
+                        <div class="t-title">景點: 胡里山炮台</div>
+                        <div class="info-block"><div class="i-icon">📍</div><div class="i-text">廈門市思明區曾厝垵路2號 <button class="copy-btn" onclick="copyToClipboard('廈門市思明區曾厝垵路2號')">📋</button></div></div>
+                        <div class="info-block">
+                            <div class="i-icon">🚕</div>
+                            <div class="i-text">搭乘 計程車<br><span class="cost-tag">交通花費：¥20</span></div>
+                        </div>
+                        <div class="info-block"><div class="i-icon">📸</div><div class="i-text">拍照留念</div></div>
+                        <a href="https://j.map.baidu.com/c7/gos" target="_blank" class="map-link">開啟 百度地圖 ↗</a>
+                    </div>
+                </div>
+                
+                <div class="trip-card">
+                    <img src="https://megapx-assets.dcard.tw/images/fe3aa22f-50ee-498d-9d24-2ff46e972a4d/640.jpeg" loading="lazy" class="card-img-top" alt="Zengcuoan">
+                    <div class="card-content">
+                        <div class="t-time">車程預估 10 分鐘</div>
+                        <div class="t-title">景點/午餐: 曾厝垵主景區-入口</div>
+                        <div class="info-block"><div class="i-icon">📍</div><div class="i-text">廈門市思明區環島南路 <button class="copy-btn" onclick="copyToClipboard('廈門市思明區環島南路')">📋</button></div></div>
+                        <div class="info-block">
+                            <div class="i-icon">🚕</div>
+                            <div class="i-text">搭乘 計程車<br><span class="cost-tag">交通花費：¥13</span></div>
+                        </div>
+                        <div class="info-block"><div class="i-icon">🍜</div><div class="i-text">午餐可能吃海鮮沙茶麵</div></div>
+                        <a href="https://j.map.baidu.com/c6/XUPi" target="_blank" class="map-link">開啟 百度地圖 ↗</a>
+                    </div>
+                </div>
+                
+                <div class="trip-card">
+                    <img src="https://www.highspeed.mtr.com.hk/tc/travel/images/theme/baa318339a5a43b48c2b3076ea8b45.jpg" loading="lazy" class="card-img-top" alt="Shapowei">
+                    <div class="card-content">
+                        <div class="t-time">車程預估 30 分鐘</div>
+                        <div class="t-title">景點: 沙坡尾藝術西區</div>
+                        <div class="info-block"><div class="i-icon">📍</div><div class="i-text">廈門市思明區沙坡尾60號 <button class="copy-btn" onclick="copyToClipboard('廈門市思明區沙坡尾60號')">📋</button></div></div>
+                        <div class="info-block">
+                            <div class="i-icon">🚕</div>
+                            <div class="i-text">搭乘 計程車<br><span class="cost-tag">交通花費：¥17</span></div>
+                        </div>
+                        <div class="info-block"><div class="i-icon">📸</div><div class="i-text">拍照留念</div></div>
+                        <a href="https://j.map.baidu.com/9c/7vK" target="_blank" class="map-link">開啟 百度地圖 ↗</a>
+                    </div>
+                </div>
+                
+                <div class="trip-card">
+                    <img src="https://lh6.googleusercontent.com/proxy/V1m0Rn2MnTCgJozk8xqaTV9XiUp8qbinJt-B-FTY41kXqhBp4ZUEa1BraqH2AQNnt2QL4-iv_4JsU4NxxqRsrpHDJJTXnXAt_6AsEW1hd5MOo6SiqTHeEocacUSJ" loading="lazy" class="card-img-top" alt="Zhongshan Road">
+                    <div class="card-content">
+                        <div class="t-time">車程預估 15 分鐘</div>
+                        <div class="t-title">吃吃喝喝: 中山路步行街</div>
+                        <div class="info-block"><div class="i-icon">📍</div><div class="i-text">廈門市思明區中山路步行街 <button class="copy-btn" onclick="copyToClipboard('廈門市思明區中山路步行街')">📋</button></div></div>
+                        <div class="info-block">
+                            <div class="i-icon">🚕</div>
+                            <div class="i-text">搭乘 計程車<br><span class="cost-tag">交通花費：¥12</span></div>
+                        </div>
+                        <div class="info-block"><div class="i-icon">🥜</div><div class="i-text">推薦：黃則和花生湯</div></div>
+                        <a href="https://j.map.baidu.com/1c/AsK" target="_blank" class="map-link">開啟 百度地圖 ↗</a>
+                    </div>
+                </div>
+                
+                <div class="trip-card">
+                    <img src="https://content.skyscnr.com/available/2306062384/2306062384_WxH.jpg" loading="lazy" class="card-img-top" alt="Return Hotel">
+                    <div class="card-content">
+                        <div class="t-time">路程預估 15 分鐘</div>
+                        <div class="t-title">回飯店: 廈門瑞頤大酒店</div>
+                        <div class="info-block"><div class="i-icon">📍</div><div class="i-text">廈門市思明區鷺江道12號 <button class="copy-btn" onclick="copyToClipboard('廈門市思明區鷺江道12號')">📋</button></div></div>
+                        <div class="info-block">
+                            <div class="i-icon">🚶</div>
+                            <div class="i-text">步行<br><span class="cost-tag">交通花費：¥0</span></div>
+                        </div>
+                        <a href="https://j.map.baidu.com/36/PoJ" target="_blank" class="map-link">開啟 百度地圖 ↗</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="day3-content" class="day-schedule">
+            <div class="day-header">Day 3 • 4/26 (日)</div>
+            <div class="timeline">
+                <div class="trip-card">
+                    <img src="https://res.klook.com/image/upload/w_750,h_469,c_fill,q_85/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/hbtmmhrg6cjylyirtb6z.jpg" loading="lazy" class="card-img-top" alt="Jimei School Village">
+                    <div class="card-content">
+                        <div class="t-time">車程預估 50 分鐘</div>
+                        <div class="t-title">景點: 集美學村</div>
+                        <div class="info-block"><div class="i-icon">📍</div><div class="i-text">廈門市集美區銀江路183號 <button class="copy-btn" onclick="copyToClipboard('廈門市集美區銀江路183號')">📋</button></div></div>
+                        <div class="info-block">
+                            <div class="i-icon">🚇</div>
+                            <div class="i-text">
+                                <span class="subway-step">步行到 <span class="subway-station">鎮海路站</span></span>
+                                <span class="subway-step">搭乘 <span class="subway-line">地鐵1號線（往岩內方向）</span></span>
+                                <span class="subway-step">搭到 <span class="subway-station">集美學村站</span> 2出口</span>
+                                <span class="cost-tag">交通花費：¥5</span>
+                            </div>
+                        </div>
+                        <div class="info-block"><div class="i-icon">📸</div><div class="i-text">拍照留念</div></div>
+                        <a href="https://j.map.baidu.com/20/zXh" target="_blank" class="map-link">開啟 百度地圖 ↗</a>
+                    </div>
+                </div>
+                
+                <div class="trip-card">
+                    <img src="https://lh4.googleusercontent.com/proxy/SE8GsZ1nxX060kbnheTETohZaxGHOI-9q-fj13hMpMrmcHN7AWrnOuF5giWQNM_R3v-JyG0GfLdAT01mwwcWq-M3bQB-8Mczrgf0ucEQfoyO3Lgckz8q" loading="lazy" class="card-img-top" alt="Outlet">
+                    <div class="card-content">
+                        <div class="t-time">車程預估 18 分鐘</div>
+                        <div class="t-title">逛街: 廈門尚柏奧特萊斯</div>
+                        <div class="info-block"><div class="i-icon">📍</div><div class="i-text">廈門市集美區天水路2號 <button class="copy-btn" onclick="copyToClipboard('廈門市集美區天水路2號')">📋</button></div></div>
+                        <div class="info-block">
+                            <div class="i-icon">🚕</div>
+                            <div class="i-text">搭乘 計程車<br><span class="cost-tag">交通花費：¥30</span></div>
+                        </div>
+                        <a href="https://j.map.baidu.com/8f/u8h" target="_blank" class="map-link">開啟 百度地圖 ↗</a>
+                    </div>
+                </div>
+                
+                <div class="trip-card">
+                    <img src="https://content.skyscnr.com/available/2306062384/2306062384_WxH.jpg" loading="lazy" class="card-img-top" alt="Return Hotel">
+                    <div class="card-content">
+                        <div class="t-time">車程預估 40 分鐘</div>
+                        <div class="t-title">回飯店: 廈門瑞頤大酒店</div>
+                        <div class="info-block"><div class="i-icon">📍</div><div class="i-text">廈門市思明區鷺江道12號 <button class="copy-btn" onclick="copyToClipboard('廈門市思明區鷺江道12號')">📋</button></div></div>
+                        <div class="info-block">
+                            <div class="i-icon">🚕</div>
+                            <div class="i-text">搭乘 計程車<br><span class="cost-tag">交通花費：¥80</span></div>
+                        </div>
+                        <div class="info-block"><div class="i-icon">💡</div><div class="i-text">休息一下</div></div>
+                        <a href="https://j.map.baidu.com/36/PoJ" target="_blank" class="map-link">開啟 百度地圖 ↗</a>
+                    </div>
+                </div>
+                
+                <div class="trip-card">
+                    <img src="https://lh6.googleusercontent.com/proxy/V1m0Rn2MnTCgJozk8xqaTV9XiUp8qbinJt-B-FTY41kXqhBp4ZUEa1BraqH2AQNnt2QL4-iv_4JsU4NxxqRsrpHDJJTXnXAt_6AsEW1hd5MOo6SiqTHeEocacUSJ" loading="lazy" class="card-img-top" alt="Zhongshan Road">
+                    <div class="card-content">
+                        <div class="t-time">路程預估 15 分鐘</div>
+                        <div class="t-title">晚餐逛逛: 中山路步行街</div>
+                        <div class="info-block"><div class="i-icon">📍</div><div class="i-text">廈門市思明區中山路 <button class="copy-btn" onclick="copyToClipboard('廈門市思明區中山路')">📋</button></div></div>
+                        <div class="info-block">
+                            <div class="i-icon">🚶</div>
+                            <div class="i-text">步行<br><span class="cost-tag">交通花費：¥0</span></div>
+                        </div>
+                        <a href="https://j.map.baidu.com/1c/AsK" target="_blank" class="map-link">開啟 百度地圖 ↗</a>
+                    </div>
+                </div>
+                
+                <div class="trip-card">
+                    <img src="https://content.skyscnr.com/available/2306062384/2306062384_WxH.jpg" loading="lazy" class="card-img-top" alt="Return Hotel">
+                    <div class="card-content">
+                        <div class="t-time">路程預估 15 分鐘</div>
+                        <div class="t-title">回飯店: 廈門瑞頤大酒店</div>
+                        <div class="info-block"><div class="i-icon">📍</div><div class="i-text">廈門市思明區鷺江道12號 <button class="copy-btn" onclick="copyToClipboard('廈門市思明區鷺江道12號')">📋</button></div></div>
+                        <div class="info-block">
+                            <div class="i-icon">🚶</div>
+                            <div class="i-text">步行<br><span class="cost-tag">交通花費：¥0</span></div>
+                        </div>
+                        <a href="https://j.map.baidu.com/36/PoJ" target="_blank" class="map-link">開啟 百度地圖 ↗</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="day4-content" class="day-schedule">
+            <div class="day-header">Day 4 • 4/27 (一)</div>
+            <div class="timeline">
+                <div class="trip-card">
+                    <img src="https://file.variflight.com/buckets/carnoc/keys/7d08cc3dcf7d03f6bbde6f98a9177a0d.jpeg" loading="lazy" class="card-img-top" alt="Airport">
+                    <div class="card-content">
+                        <div class="t-time">車程預估 25 分鐘</div>
+                        <div class="t-title">出發機場: 廈門高崎國際機場</div>
+                        <div class="info-block"><div class="i-icon">📍</div><div class="i-text">廈門市湖里區翔雲一路121號 <button class="copy-btn" onclick="copyToClipboard('廈門市湖里區翔雲一路121號')">📋</button></div></div>
+                        <div class="info-block">
+                            <div class="i-icon">🚕</div>
+                            <div class="i-text">搭乘 計程車<br><span class="cost-tag">交通花費：¥45</span></div>
+                        </div>
+                        <div class="info-block"><div class="i-icon">✈️</div><div class="i-text">準備搭乘 11:40 班機回台</div></div>
+                        <a href="https://j.map.baidu.com/47/bYd" target="_blank" class="map-link">開啟 百度地圖 ↗</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function forceAppUpdate() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) { registration.unregister(); }
+                }).then(() => { window.location.reload(true); });
+            } else { window.location.reload(true); }
+        }
+
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVVY1EqQrjndhkeej_NIabBYYjNORHcRkaoev-wRGcWsRdO6HnvVrXg7BIIEHUYrVP/exec';
+        
+        const currentRate = 4.45; 
+        
+        let expenses = []; 
+        let selectedInputDate = '4/24'; 
+        let selectedCategory = '交通';
+        let selectedCurrency = 'RMB'; 
+        let selectedUser = localStorage.getItem('trip_user') || '成員A'; // 新增預設成員變數
+        
+        const tripDates = ['4/24', '4/25', '4/26', '4/27']; 
+        
+        const XIAMEN_LAT = 24.4798; 
+        const XIAMEN_LON = 118.0894;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTab = localStorage.getItem('active_tab') || 'accounting';
+            if(savedTab === 'itinerary') {
+                const savedDay = localStorage.getItem('active_day') || 'day1';
+                switchView('itinerary', savedDay);
+                document.getElementById('day-selector').value = savedDay;
+            } else { switchView(savedTab); }
+            
+            fetchXiamenWeather(); selectDate('4/24'); fetchExpenses();
+            selectUser(selectedUser); // 初始化選擇成員
+        });
+
+        async function fetchExpenses() {
+            const listEl = document.getElementById('expense-list');
+            if(expenses.length === 0) listEl.innerHTML = '<div class="loading-text">🔄 正在同步全家人的帳本...</div>';
+            try {
+                const params = new URLSearchParams({ action: 'read' });
+                const res = await fetch(`${SCRIPT_URL}?${params}`);
+                const data = await res.json();
+                expenses = data; renderExpenses();
+            } catch (err) {
+                console.error(err);
+                if(expenses.length === 0) listEl.innerHTML = '<div class="loading-text">⚠️ 連線較慢或失敗<br>請檢查網路或稍後重試</div>';
+            }
+        }
+
+        function selectCurrency(curr) {
+            selectedCurrency = curr;
+            document.getElementById('btn-curr-rmb').classList.remove('active');
+            document.getElementById('btn-curr-twd').classList.remove('active');
+            
+            if (curr === 'RMB') {
+                document.getElementById('btn-curr-rmb').classList.add('active');
+                document.getElementById('item-price').placeholder = "輸入金額 (¥)";
+            } else {
+                document.getElementById('btn-curr-twd').classList.add('active');
+                document.getElementById('item-price').placeholder = "輸入金額 ($)";
+            }
+        }
+
+        // 新增切換成員的函數
+        function selectUser(user) { 
+            selectedUser = user; 
+            localStorage.setItem('trip_user', user); 
+            document.querySelectorAll('.user-btn').forEach(btn => { 
+                btn.classList.remove('active'); 
+                if(btn.innerText === user) btn.classList.add('active'); 
+            }); 
+        }
+
+        async function addExpense() {
+            const nameInput = document.getElementById('item-name');
+            const priceInput = document.getElementById('item-price');
+            const btn = document.getElementById('btn-add');
+            
+            let finalName = nameInput.value.trim() || selectedCategory;
+            let inputPrice = parseFloat(priceInput.value); 
+            
+            if (isNaN(inputPrice)) { alert('請輸入金額！'); return; }
+            
+            let finalPriceTWD; 
+
+            if (selectedCurrency === 'RMB') {
+                finalPriceTWD = Math.round(inputPrice * currentRate); 
+            } else {
+                finalPriceTWD = Math.round(inputPrice); 
+            }
+            
+            const formData = new URLSearchParams();
+            formData.append('action', 'add'); 
+            formData.append('id', Date.now()); 
+            formData.append('date', selectedInputDate);
+            formData.append('cat', selectedCategory); 
+            formData.append('name', finalName); 
+            formData.append('price', finalPriceTWD); 
+            formData.append('user', selectedUser); // 把選擇的成員加進送出的資料中
+
+            btn.disabled = true; btn.innerText = '⏳ 儲存中...';
+
+            try {
+                await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+                nameInput.value = ''; priceInput.value = ''; await fetchExpenses();
+            } catch (err) { 
+                alert('新增失敗！請確認網路連線'); 
+            } finally { 
+                btn.disabled = false; btn.innerText = `確認新增 (至 ${selectedInputDate})`; 
+            }
+        }
+
+        async function deleteExpense(id) {
+            if(!confirm('確定刪除此筆紀錄？(會同步刪除大家的紀錄)')) return;
+            const formData = new URLSearchParams(); 
+            formData.append('action', 'delete'); 
+            formData.append('id', id);
+            
+            const originalExpenses = [...expenses]; 
+            expenses = expenses.filter(item => item.id != id); 
+            renderExpenses();
+
+            try { 
+                await fetch(SCRIPT_URL, { method: 'POST', body: formData }); 
+                fetchExpenses(); 
+            } catch (err) { 
+                alert('刪除失敗，資料將還原。'); 
+                expenses = originalExpenses; renderExpenses(); 
+            }
+        }
+
+        async function fetchXiamenWeather() {
+            const badge = document.getElementById('weather-badge');
+            try {
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${XIAMEN_LAT}&longitude=${XIAMEN_LON}&current_weather=true&timezone=Asia%2FShanghai`);
+                const data = await res.json();
+                const temp = Math.round(data.current_weather.temperature);
+                const code = data.current_weather.weathercode;
+                badge.innerHTML = `🇨🇳 廈門 ${temp}°C ${getWeatherEmoji(code)}`;
+            } catch (e) { badge.innerHTML = '🇨🇳 天氣載入失敗'; }
+        }
+
+        function getWeatherEmoji(code) {
+            if(code===0)return'☀️';if(code<=3)return'☁️';if(code<=48)return'🌫️';if(code<=67)return'🌧️';if(code<=77)return'❄️';if(code<=82)return'🌦️';if(code>=95)return'⛈️';return'🌥️';
+        }
+
+        function switchView(target, dayId) {
+            localStorage.setItem('active_tab', target);
+            document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+            document.getElementById('btn-accounting').classList.remove('active');
+            document.getElementById('btn-flight').classList.remove('active');
+            document.getElementById('day-selector').classList.remove('active');
+            document.getElementById('wrapper-itinerary').classList.remove('active');
+
+            if (target === 'accounting') {
+                document.getElementById('view-accounting').classList.add('active');
+                document.getElementById('btn-accounting').classList.add('active');
+                document.getElementById('day-selector').value = "";
+                fetchExpenses();
+            } else if (target === 'flight') {
+                document.getElementById('view-flight').classList.add('active');
+                document.getElementById('btn-flight').classList.add('active');
+                document.getElementById('day-selector').value = "";
+            } else if (target === 'itinerary') {
+                if (!dayId) dayId = 'day1';
+                document.getElementById('view-itinerary').classList.add('active');
+                document.querySelectorAll('.day-schedule').forEach(el => el.classList.remove('active'));
+                
+                let dayEl = document.getElementById(dayId + '-content');
+                if(dayEl) {
+                    dayEl.classList.add('active');
+                    window.scrollTo({ top: dayEl.offsetTop - 80, behavior: 'smooth' });
+                }
+                document.getElementById('day-selector').classList.add('active');
+                document.getElementById('wrapper-itinerary').classList.add('active');
+                localStorage.setItem('active_day', dayId);
+            }
+        }
+
+        function selectDate(date) { selectedInputDate = date; document.querySelectorAll('.date-chip').forEach(chip => { chip.classList.remove('active'); if(chip.innerText.includes(date)) chip.classList.add('active'); }); document.getElementById('btn-date-label').innerText = date; }
+        function selectCategory(cat) { selectedCategory = cat; document.querySelectorAll('.cat-btn').forEach(btn => { btn.classList.remove('active'); if(btn.textContent.includes(cat)) btn.classList.add('active'); }); }
+
+        function renderExpenses() {
+            const listEl = document.getElementById('expense-list');
+            listEl.innerHTML = ''; 
+            let grandTotalTWD = 0; 
+            let statsTWD = { '交通':0, '食物':0, '購物':0, '其他':0 };
+            
+            if (!expenses || expenses.length === 0) {
+                listEl.innerHTML = '<div style="text-align:center; color:var(--color-2); padding:30px; opacity:0.6; font-weight:700;">目前沒有記帳資料<br>嘗試新增一筆吧！</div>';
+                updateStats(0, statsTWD); return;
+            }
+
+            let hasRenderedAny = false;
+
+            tripDates.forEach(date => {
+                const dailyItems = expenses.filter(item => {
+                    const sheetDate = String(item.date).trim();
+                    if (sheetDate === date) return true; 
+                    if (sheetDate.includes('T')) { 
+                        const d = new Date(sheetDate);
+                        const formatted = (d.getMonth() + 1) + '/' + d.getDate();
+                        if (formatted === date) return true;
+                    }
+                    if (sheetDate.includes(date)) return true; 
+                    return false;
+                });
+
+                if (dailyItems.length > 0) {
+                    hasRenderedAny = true;
+                    const divider = document.createElement('div'); divider.className = 'date-divider'; divider.innerHTML = `${date}`; listEl.appendChild(divider);
+                    dailyItems.forEach(item => {
+                        const twdValue = Math.round(parseFloat(item.price));
+                        
+                        grandTotalTWD += twdValue;
+                        if(statsTWD[item.cat] !== undefined) statsTWD[item.cat] += twdValue; else statsTWD['其他'] += twdValue;
+                        
+                        let rmbValue = (twdValue / currentRate).toFixed(1);
+
+                        // 加入顯示成員標籤
+                        const userTag = item.user ? `<span class="user-tag">${item.user}</span>` : '';
+
+                        const div = document.createElement('div'); div.className = 'history-item';
+                        div.innerHTML = `<div><div class="h-name">${userTag}${getCatEmoji(item.cat)} ${item.name}</div><div class="h-cat">${item.cat}</div></div><div style="display:flex; align-items:center;"><div><div class="h-price">NT$ ${twdValue.toLocaleString()}</div><span class="h-twd">≈ ¥ ${rmbValue}</span></div><button class="del-btn" onclick="deleteExpense(${item.id})">×</button></div>`;
+                        listEl.appendChild(div);
+                    });
+                }
+            });
+            
+            if (!hasRenderedAny && expenses.length > 0) {
+                listEl.innerHTML = '<div style="text-align:center; color:var(--color-2); padding:30px; opacity:0.6; font-weight:700;">有記帳紀錄，但日期對不上<br>建議到 Google 試算表把舊資料清空！</div>';
+            }
+
+            updateStats(grandTotalTWD, statsTWD);
+        }
+
+        function updateStats(totalTWD, statsTWD) {
+            let displayTotalRMB = (totalTWD / currentRate).toFixed(1);
+            
+            document.getElementById('total-primary').textContent = `NT$ ${totalTWD.toLocaleString()}`;
+            document.getElementById('total-secondary').textContent = `≈ ¥ ${displayTotalRMB}`;
+            
+            const TOTAL_BUDGET = 30000;
+            let remaining = TOTAL_BUDGET - totalTWD;
+            let spentPercent = Math.min(100, Math.max(0, (totalTWD / TOTAL_BUDGET) * 100));
+            
+            const budgetRemRow = document.getElementById('budget-rem-row');
+            const budgetFill = document.getElementById('budget-fill');
+            
+            if (remaining < 0) {
+                budgetRemRow.textContent = `超支：NT$ ${Math.abs(remaining).toLocaleString()}`;
+                budgetRemRow.classList.add('danger-text');
+                budgetFill.classList.add('danger-bg');
+            } else {
+                budgetRemRow.textContent = `剩餘：NT$ ${remaining.toLocaleString()}`;
+                budgetRemRow.classList.remove('danger-text');
+                
+                if (spentPercent >= 80) {
+                    budgetFill.classList.add('danger-bg');
+                    budgetRemRow.classList.add('danger-text');
+                } else {
+                    budgetFill.classList.remove('danger-bg');
+                }
+            }
+            
+            budgetFill.style.width = `${spentPercent}%`;
+
+            document.getElementById('stat-transport').textContent = `NT$ ${statsTWD['交通'].toLocaleString()}`;
+            document.getElementById('stat-food').textContent = `NT$ ${statsTWD['食物'].toLocaleString()}`;
+            document.getElementById('stat-shopping').textContent = `NT$ ${statsTWD['購物'].toLocaleString()}`;
+            document.getElementById('stat-other').textContent = `NT$ ${statsTWD['其他'].toLocaleString()}`;
+        }
+
+        function getCatEmoji(cat) { return (cat==='交通'?'🚕':(cat==='食物'?'🍔':(cat==='購物'?'🛍️':'✨'))); }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('已複製地址：' + text);
+            }).catch(err => {
+                console.error('複製失敗', err);
+            });
+        }
+    </script>
+</body>
+</html>
