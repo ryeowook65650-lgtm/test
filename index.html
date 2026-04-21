@@ -120,14 +120,20 @@
         .date-picker-wrapper { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow-card); display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border-color); }
         .date-picker-wrapper input { font-size: 16px; font-weight: 600; color: var(--text-main); width: 100%; background: transparent; }
 
+        /* 收支切換按鈕強化 */
         .type-segment { display: flex; gap: 8px; margin-bottom: 20px; }
-        .type-btn { flex: 1; text-align: center; padding: 12px 0; font-size: 15px; font-weight: 800; border-radius: 12px; transition: 0.2s; background: var(--secondary); color: #7a7067; border: 2px solid transparent;}
-        .type-btn.active.expense { background: var(--card-bg); color: var(--primary); border-color: var(--primary); box-shadow: var(--shadow-card); }
-        .type-btn.active.income { background: var(--card-bg); color: var(--income-color); border-color: var(--income-color); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2); }
+        .type-btn { flex: 1; text-align: center; padding: 12px 0; font-size: 15px; font-weight: 800; border-radius: 12px; transition: all 0.3s ease; background: var(--secondary); color: #7a7067; border: 2px solid transparent;}
+        .type-btn.active.expense { background: var(--card-bg) !important; color: var(--primary) !important; border-color: var(--primary) !important; box-shadow: var(--shadow-card); }
+        .type-btn.active.income { background: var(--card-bg) !important; color: var(--income-color) !important; border-color: var(--income-color) !important; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2); }
 
         .segment-wrapper { background: var(--secondary); border-radius: 12px; display: flex; padding: 4px; margin-bottom: 20px; }
         .seg-btn { flex: 1; text-align: center; padding: 10px 0; font-size: 14px; font-weight: 600; color: #7a7067; border-radius: 8px; transition: 0.2s; }
         .seg-btn.active { background: #FFF; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+
+        /* 代墊人專屬區塊 */
+        .payer-segment { display: none; align-items: center; gap: 12px; margin-top: -10px; margin-bottom: 20px; background: rgba(224, 215, 207, 0.3); padding: 8px 12px; border-radius: 12px; border: 1px dashed rgba(84, 140, 146, 0.3); animation: fadeIn 0.3s ease forwards; }
+        .payer-segment.active { display: flex; }
+        .payer-segment span { font-size: 13px; font-weight: 800; color: var(--primary); flex-shrink: 0; }
 
         .section-title { font-size: 15px; font-weight: 800; margin: 0 0 12px; color: var(--text-main); }
         .bento-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
@@ -159,7 +165,8 @@
         .h-icon { width: 44px; height: 44px; background: rgba(224, 215, 207, 0.4); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--primary); }
         .h-icon.inc { background: rgba(76, 175, 80, 0.1); color: var(--income-color); }
         .h-info h4 { margin: 0 0 4px; font-size: 15px; font-weight: 600; color: var(--text-main); }
-        .h-tag { font-size: 10px; background: var(--primary-light); padding: 3px 6px; border-radius: 4px; font-weight: 800; color: #2c4d51; }
+        .h-tag { font-size: 11px; background: var(--primary-light); padding: 3px 6px; border-radius: 4px; font-weight: 800; color: #2c4d51; margin-left: 6px; display: inline-block;}
+        .h-tag.shared { background: #ffe4b5; color: #d97706; } /* 共用標籤特殊色 */
         .h-right { text-align: right; }
         .h-price { font-size: 17px; font-weight: 800; color: var(--primary); margin-bottom: 2px; }
         .h-price.inc { color: var(--income-color); }
@@ -171,12 +178,11 @@
            ========================================= */
         .dash-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
         .dash-card { background: var(--card-bg); padding: 16px; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); border: 1px solid var(--border-color); }
-        .dash-card.full { grid-column: span 2; background: linear-gradient(135deg, #FFF 0%, #f9f9f9 100%); text-align: center;}
-        .dc-title { font-size: 12px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .dash-card.full { grid-column: span 2; background: linear-gradient(135deg, #FFF 0%, #fefeea 100%); text-align: center; border: 2px solid rgba(84, 140, 146, 0.2);}
+        .dc-title { font-size: 13px; color: var(--text-muted); font-weight: 800; margin-bottom: 8px; display: block; }
         .dc-val { font-size: 22px; font-weight: 800; color: var(--text-main); }
-        .dc-val.inc { color: var(--income-color); }
         .dc-val.exp { color: var(--primary); }
-        .dc-val.net { font-size: 32px; color: var(--text-main); }
+        .dc-val.net { font-size: 26px; color: var(--primary); margin: 8px 0; }
 
         .chart-section { background: var(--card-bg); padding: 20px; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); border: 1px solid var(--border-color); margin-bottom: 24px; }
         .chart-row { margin-bottom: 16px; }
@@ -186,10 +192,9 @@
         .cr-val { color: var(--text-muted); }
         .cr-track { height: 8px; background: rgba(224, 215, 207, 0.5); border-radius: 4px; overflow: hidden; }
         .cr-fill { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.8s ease; }
-        .cr-fill.inc { background: var(--income-color); }
-        .cr-fill.p1 { background: #548c92; } /* 噗噗 */
-        .cr-fill.p2 { background: #b4d7d8; } /* 廖噗 */
-        .cr-fill.p3 { background: #e0d7cf; } /* 陳噗 */
+        .cr-fill.p1 { background: #548c92; } 
+        .cr-fill.p2 { background: #b4d7d8; } 
+        .cr-fill.p3 { background: #e0d7cf; } 
 
         .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; pointer-events: none;}
         .toast { background: rgba(84, 140, 146, 0.95); backdrop-filter: blur(10px); color: #FFF; padding: 14px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; animation: toastIn 0.3s forwards; }
@@ -236,11 +241,11 @@
 
                 <div class="personal-totals">
                     <div class="p-tot">
-                        <span>👩🏻 廖噗</span>
+                        <span>👩🏻 廖噗 (個人)</span>
                         <strong id="total-p2">$0</strong>
                     </div>
                     <div class="p-tot">
-                        <span>👦🏻 陳噗</span>
+                        <span>👦🏻 陳噗 (個人)</span>
                         <strong id="total-p3">$0</strong>
                     </div>
                 </div>
@@ -252,45 +257,37 @@
 
             <div class="type-segment">
                 <button class="type-btn active expense" id="btn-type-exp" onclick="setRecordType('expense')">支出</button>
-                <button class="type-btn" id="btn-type-inc" onclick="setRecordType('income')">收入</button>
+                <button class="type-btn income" id="btn-type-inc" onclick="setRecordType('income')">收入</button>
             </div>
 
             <div class="segment-wrapper" id="person-segment">
-                <button class="seg-btn active" onclick="selectPerson('', this)">👥 噗噗</button>
+                <button class="seg-btn active" onclick="selectPerson('噗噗', this)">👥 共用</button>
                 <button class="seg-btn" onclick="selectPerson('廖噗', this)">👩🏻 廖噗</button>
                 <button class="seg-btn" onclick="selectPerson('陳噗', this)">👦🏻 陳噗</button>
+            </div>
+
+            <div class="payer-segment active" id="payer-container">
+                <span>由誰代墊：</span>
+                <div class="segment-wrapper" style="margin-bottom: 0; flex: 1;">
+                    <button class="seg-btn active" onclick="selectPayer('廖噗', this)">👩🏻 廖噗</button>
+                    <button class="seg-btn" onclick="selectPayer('陳噗', this)">👦🏻 陳噗</button>
+                </div>
             </div>
 
             <h3 class="section-title" id="cat-title">選擇支出分類</h3>
             
             <div class="bento-grid" id="cat-expense-grid">
-                <button class="bento-box active" onclick="selectCategory('交通', this)">
-                    <i class="ph-fill ph-train bento-icon"></i><span class="bento-label">交通</span>
-                </button>
-                <button class="bento-box" onclick="selectCategory('食物', this)">
-                    <i class="ph-fill ph-hamburger bento-icon"></i><span class="bento-label">食物</span>
-                </button>
-                <button class="bento-box" onclick="selectCategory('購物', this)">
-                    <i class="ph-fill ph-shopping-bag bento-icon"></i><span class="bento-label">購物</span>
-                </button>
-                <button class="bento-box" onclick="selectCategory('其他', this)">
-                    <i class="ph-fill ph-ticket bento-icon"></i><span class="bento-label">其他</span>
-                </button>
+                <button class="bento-box active" onclick="selectCategory('交通', this)"><i class="ph-fill ph-train bento-icon"></i><span class="bento-label">交通</span></button>
+                <button class="bento-box" onclick="selectCategory('食物', this)"><i class="ph-fill ph-hamburger bento-icon"></i><span class="bento-label">食物</span></button>
+                <button class="bento-box" onclick="selectCategory('購物', this)"><i class="ph-fill ph-shopping-bag bento-icon"></i><span class="bento-label">購物</span></button>
+                <button class="bento-box" onclick="selectCategory('其他', this)"><i class="ph-fill ph-ticket bento-icon"></i><span class="bento-label">其他</span></button>
             </div>
 
             <div class="bento-grid" id="cat-income-grid" style="display: none;">
-                <button class="bento-box income-cat active" onclick="selectCategory('薪水', this)">
-                    <i class="ph-fill ph-money bento-icon"></i><span class="bento-label">薪水</span>
-                </button>
-                <button class="bento-box income-cat" onclick="selectCategory('獎金', this)">
-                    <i class="ph-fill ph-gift bento-icon"></i><span class="bento-label">獎金</span>
-                </button>
-                <button class="bento-box income-cat" onclick="selectCategory('轉帳', this)">
-                    <i class="ph-fill ph-bank bento-icon"></i><span class="bento-label">轉帳</span>
-                </button>
-                <button class="bento-box income-cat" onclick="selectCategory('其他入帳', this)">
-                    <i class="ph-fill ph-piggy-bank bento-icon"></i><span class="bento-label">其他</span>
-                </button>
+                <button class="bento-box income-cat active" onclick="selectCategory('薪水', this)"><i class="ph-fill ph-money bento-icon"></i><span class="bento-label">薪水</span></button>
+                <button class="bento-box income-cat" onclick="selectCategory('獎金', this)"><i class="ph-fill ph-gift bento-icon"></i><span class="bento-label">獎金</span></button>
+                <button class="bento-box income-cat" onclick="selectCategory('轉帳', this)"><i class="ph-fill ph-bank bento-icon"></i><span class="bento-label">轉帳</span></button>
+                <button class="bento-box income-cat" onclick="selectCategory('其他入帳', this)"><i class="ph-fill ph-piggy-bank bento-icon"></i><span class="bento-label">其他</span></button>
             </div>
 
             <h3 class="section-title">記下一筆</h3>
@@ -317,24 +314,22 @@
                 <input type="month" id="analysis-month">
             </div>
 
+            <h3 class="section-title">共用花費結算板</h3>
             <div class="dash-summary">
                 <div class="dash-card full">
-                    <span class="dc-title">當月淨結餘 (總收入 - 總支出)</span>
-                    <div class="dc-val net" id="dash-net">$0</div>
+                    <span class="dc-title">結算結果 (不含個人支出與收入)</span>
+                    <div class="dc-val net" id="settlement-text">計算中...</div>
+                    <div style="font-size: 13px; color: var(--text-muted); font-weight: 600;" id="settlement-sub">共用總額 $0 (每人應分攤 $0)</div>
                 </div>
                 <div class="dash-card">
-                    <span class="dc-title">總收入</span>
-                    <div class="dc-val inc" id="dash-inc">$0</div>
+                    <span class="dc-title">👩🏻 廖噗已代墊</span>
+                    <div class="dc-val exp" id="dash-liao-paid">$0</div>
                 </div>
                 <div class="dash-card">
-                    <span class="dc-title">總支出</span>
-                    <div class="dc-val exp" id="dash-exp">$0</div>
+                    <span class="dc-title">👦🏻 陳噗已代墊</span>
+                    <div class="dc-val exp" id="dash-chen-paid">$0</div>
                 </div>
             </div>
-
-            <h3 class="section-title">成員花費比例 (含個人與共用支出)</h3>
-            <div class="chart-section" id="member-chart-container">
-                </div>
 
             <h3 class="section-title">整體支出分類排行</h3>
             <div class="chart-section" id="cat-chart-container">
@@ -348,8 +343,8 @@
             <span>記帳</span>
         </button>
         <button class="tab-btn" id="tab-analysis" onclick="switchTab('analysis')">
-            <i class="ph-fill ph-chart-pie-slice"></i>
-            <span>分析</span>
+            <i class="ph-fill ph-handshake"></i>
+            <span>結算分析</span>
         </button>
     </nav>
 
@@ -373,7 +368,8 @@
                 budget: parseInt(localStorage.getItem('monthly_budget')) || 15000,
                 date: '',           
                 analysisMonth: '',  
-                person: '',     
+                person: '噗噗',   // 預設共用
+                payer: '廖噗',    // 預設代墊人
                 category: '交通',
                 recordType: 'expense' 
             },
@@ -428,7 +424,7 @@
             document.getElementById(`view-${tabId}`).classList.add('active');
             document.getElementById(`tab-${tabId}`).classList.add('active');
             
-            document.getElementById('header-title').innerText = tabId === 'analysis' ? '每月分析' : '噗噗記帳本';
+            document.getElementById('header-title').innerText = tabId === 'analysis' ? '當月結算' : '噗噗記帳本';
 
             if (tabId === 'analysis') renderAnalysis();
         }
@@ -437,8 +433,17 @@
             Store.state.recordType = type;
             const isInc = type === 'income';
             
-            document.getElementById('btn-type-exp').classList.toggle('active', !isInc);
-            document.getElementById('btn-type-inc').classList.toggle('active', isInc);
+            // 強制移除與加入 Class 保證按鈕變色
+            const expBtn = document.getElementById('btn-type-exp');
+            const incBtn = document.getElementById('btn-type-inc');
+            
+            if (isInc) {
+                expBtn.classList.remove('active');
+                incBtn.classList.add('active');
+            } else {
+                incBtn.classList.remove('active');
+                expBtn.classList.add('active');
+            }
             
             document.getElementById('cat-expense-grid').style.display = isInc ? 'none' : 'grid';
             document.getElementById('cat-income-grid').style.display = isInc ? 'grid' : 'none';
@@ -454,6 +459,7 @@
             const btn = document.getElementById('submit-btn');
             const input = document.getElementById('item-price');
             
+            // 下方顏色一併連動
             if (isInc) {
                 wrapper.style.background = 'rgba(76, 175, 80, 0.1)';
                 sym.style.color = 'var(--income-color)';
@@ -474,6 +480,21 @@
         function selectPerson(person, el) {
             Store.state.person = person;
             document.querySelectorAll('#person-segment .seg-btn').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+            
+            // 只有選擇「共用」時，才會顯示代墊人選項
+            const payerContainer = document.getElementById('payer-container');
+            if(person === '噗噗') {
+                payerContainer.classList.add('active');
+            } else {
+                payerContainer.classList.remove('active');
+            }
+        }
+
+        function selectPayer(payer, el) {
+            Store.state.payer = payer;
+            const parent = el.parentElement;
+            parent.querySelectorAll('.seg-btn').forEach(btn => btn.classList.remove('active'));
             el.classList.add('active');
         }
 
@@ -516,6 +537,7 @@
             }, 2500);
         }
 
+        // 解析資料核心：從字串中萃取「記錄人」與「代墊人」
         function parseItem(item, targetDateStr, targetMonthStr) {
             const sheetDate = String(item.date).trim();
             const rawPrice = parseFloat(item.price) || 0;
@@ -541,14 +563,25 @@
 
             const safeName = String(item.name).replace(/[<>]/g, "");
             let person = '噗噗'; 
+            let payer = '未知';
             let displayName = safeName;
+            
+            // 解析標籤格式：例如 【噗噗|廖噗】 或 【廖噗】
             const tagMatch = safeName.match(/^【(.*?)】(.*)/);
             if (tagMatch) {
-                person = tagMatch[1];
+                const fullTag = tagMatch[1];
                 displayName = tagMatch[2].trim();
+                if (fullTag.includes('|')) {
+                    const parts = fullTag.split('|');
+                    person = parts[0];
+                    payer = parts[1];
+                } else {
+                    person = fullTag;
+                    payer = fullTag; // 個人的話，代墊人就是自己
+                }
             }
 
-            return { ...item, isIncome, absPrice, isSameMonth, isSameDay, person, displayName };
+            return { ...item, isIncome, absPrice, isSameMonth, isSameDay, person, payer, displayName };
         }
 
         function renderExpenses() {
@@ -578,14 +611,23 @@
                     const icon = EMOJI_MAP[item.cat] || 'ph-ticket';
                     const incClass = item.isIncome ? 'inc' : '';
                     const sign = item.isIncome ? '+' : '';
-                    const personTag = item.person !== '噗噗' ? `<span class="h-tag">${item.person}</span>` : '';
+                    
+                    // 標籤顯示邏輯
+                    let personTagHtml = '';
+                    if (!item.isIncome) {
+                        if (item.person === '噗噗') {
+                            personTagHtml = `<span class="h-tag shared">👥 共用 (${item.payer}墊)</span>`;
+                        } else {
+                            personTagHtml = `<span class="h-tag">${item.person}</span>`;
+                        }
+                    }
 
                     listEl.innerHTML += `
                     <div class="h-item">
                         <div class="h-left">
                             <div class="h-icon ${incClass}"><i class="ph-fill ${icon}"></i></div>
                             <div class="h-info">
-                                <h4>${item.displayName} ${personTag}</h4>
+                                <h4>${item.displayName} ${personTagHtml}</h4>
                                 <span class="h-cat">${item.cat}</span>
                             </div>
                         </div>
@@ -597,7 +639,6 @@
                 });
             }
             
-            // 更新三者的當月累計
             document.getElementById('total-shared').innerText = `NT$ ${monthlyShared.toLocaleString()}`;
             document.getElementById('total-p2').innerText = `$${monthlyP2.toLocaleString()}`;
             document.getElementById('total-p3').innerText = `$${monthlyP3.toLocaleString()}`;
@@ -624,54 +665,55 @@
         }
 
         function renderAnalysis() {
-            let totalInc = 0;
-            let totalExp = 0;
+            let sharedPaidByLiao = 0;
+            let sharedPaidByChen = 0;
+            let totalExp = 0; // 用於計算分類圓餅圖的總花費
             let catStats = {};
-            let memberStats = { '噗噗': 0, '廖噗': 0, '陳噗': 0 };
 
             Store.state.expenses.forEach(rawItem => {
                 const item = parseItem(rawItem, '', Store.state.analysisMonth);
                 
-                if (item.isSameMonth) {
-                    if (item.isIncome) {
-                        totalInc += item.absPrice;
-                    } else {
-                        totalExp += item.absPrice;
-                        catStats[item.cat] = (catStats[item.cat] || 0) + item.absPrice;
-                        if(memberStats[item.person] !== undefined) {
-                            memberStats[item.person] += item.absPrice;
-                        } else {
-                            memberStats['噗噗'] += item.absPrice; 
-                        }
+                if (item.isSameMonth && !item.isIncome) {
+                    totalExp += item.absPrice;
+                    catStats[item.cat] = (catStats[item.cat] || 0) + item.absPrice;
+                    
+                    // 只有共用的部分才算進結算
+                    if (item.person === '噗噗') {
+                        if (item.payer === '廖噗') sharedPaidByLiao += item.absPrice;
+                        if (item.payer === '陳噗') sharedPaidByChen += item.absPrice;
                     }
                 }
             });
 
-            const net = totalInc - totalExp;
-            document.getElementById('dash-inc').innerText = `$${totalInc.toLocaleString()}`;
-            document.getElementById('dash-exp').innerText = `$${totalExp.toLocaleString()}`;
+            // 結算核心邏輯
+            const sharedTotal = sharedPaidByLiao + sharedPaidByChen;
+            const half = Math.round(sharedTotal / 2);
             
-            const netEl = document.getElementById('dash-net');
-            netEl.innerText = `${net >= 0 ? '+' : ''}$${net.toLocaleString()}`;
-            netEl.style.color = net > 0 ? 'var(--income-color)' : (net < 0 ? 'var(--primary)' : 'var(--text-main)');
+            document.getElementById('dash-liao-paid').innerText = `$${sharedPaidByLiao.toLocaleString()}`;
+            document.getElementById('dash-chen-paid').innerText = `$${sharedPaidByChen.toLocaleString()}`;
+            document.getElementById('settlement-sub').innerText = `共用總額 $${sharedTotal.toLocaleString()} (每人應分攤 $${half.toLocaleString()})`;
 
-            let memHtml = '';
-            const mColors = { '噗噗': 'p1', '廖噗': 'p2', '陳噗': 'p3' };
-            const memIcon = { '噗噗': '👥', '廖噗': '👩🏻', '陳噗': '👦🏻' };
-            for (let m in memberStats) {
-                let val = memberStats[m];
-                let pct = totalExp === 0 ? 0 : Math.round((val / totalExp) * 100);
-                memHtml += `
-                <div class="chart-row">
-                    <div class="cr-top">
-                        <div class="cr-name">${memIcon[m]} ${m}</div>
-                        <div class="cr-val">$${val.toLocaleString()} (${pct}%)</div>
-                    </div>
-                    <div class="cr-track"><div class="cr-fill ${mColors[m]}" style="width: ${pct}%"></div></div>
-                </div>`;
+            const netEl = document.getElementById('settlement-text');
+            if (sharedTotal === 0) {
+                netEl.innerText = "目前無共用花費";
+                netEl.style.color = "var(--text-muted)";
+            } else {
+                const liaoBalance = sharedPaidByLiao - half;
+                const chenBalance = sharedPaidByChen - half;
+
+                if (liaoBalance > 0) {
+                    netEl.innerHTML = `👦🏻 陳噗 <span style="font-size:16px; color:#8E8E93; font-weight:600;">應給</span> 👩🏻 廖噗<br>$${liaoBalance.toLocaleString()}`;
+                    netEl.style.color = "var(--primary)";
+                } else if (chenBalance > 0) {
+                    netEl.innerHTML = `👩🏻 廖噗 <span style="font-size:16px; color:#8E8E93; font-weight:600;">應給</span> 👦🏻 陳噗<br>$${chenBalance.toLocaleString()}`;
+                    netEl.style.color = "var(--primary)";
+                } else {
+                    netEl.innerText = "帳目已完全結清！🎉";
+                    netEl.style.color = "var(--income-color)";
+                }
             }
-            document.getElementById('member-chart-container').innerHTML = memHtml;
 
+            // 分類排行
             let catHtml = '';
             let sortedCats = Object.keys(catStats).sort((a,b) => catStats[b] - catStats[a]);
             
@@ -716,7 +758,18 @@
             
             let baseName = nameEl.value.trim() || Store.state.category;
             let isInc = Store.state.recordType === 'income';
-            let finalName = (!isInc && Store.state.person) ? `【${Store.state.person}】${baseName}` : baseName;
+            
+            let finalName = baseName;
+            
+            // 標籤組合邏輯：若為支出，依據不同對象組合字串
+            if (!isInc) {
+                if (Store.state.person === '噗噗') {
+                    // 共用的話，把代墊人寫進標籤中
+                    finalName = `【噗噗|${Store.state.payer}】${baseName}`;
+                } else if (Store.state.person) {
+                    finalName = `【${Store.state.person}】${baseName}`;
+                }
+            }
             
             let finalPrice = isInc ? -Math.abs(Math.round(inputPrice)) : Math.abs(Math.round(inputPrice));
             
