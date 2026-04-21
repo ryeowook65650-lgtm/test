@@ -7,7 +7,7 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="theme-color" content="#F2F2F7">
+    <meta name="theme-color" content="#fefeea">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,24 +17,24 @@
 
     <style>
         /* =========================================
-           1. 現代原生 App 變數設定 (iOS/Bento Style)
+           1. 現代原生 App 變數設定 (您指定的質感色票)
            ========================================= */
         :root {
-            --bg-color: #F2F2F7;
-            --card-bg: #FFFFFF;
-            --primary: #D32F2F;
-            --primary-light: #FFEBEE;
-            --secondary: #007AFF;
+            --bg-color: #fefeea;       /* 鵝黃色 (背景) */
+            --card-bg: #FFFFFF;        /* 純白 (卡片) */
+            --primary: #548c92;        /* 深青色 (主色調、按鈕) */
+            --primary-light: #b4d7d8;  /* 淺青色 (選取狀態、副色) */
+            --secondary: #e0d7cf;      /* 暖灰/奶茶色 (分頁背景、邊框) */
             --text-main: #1C1C1E;
             --text-muted: #8E8E93;
-            --border-color: #E5E5EA;
+            --border-color: rgba(224, 215, 207, 0.6); 
             
             --radius-lg: 24px;
             --radius-md: 16px;
             --radius-sm: 10px;
             
-            --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.04);
-            --shadow-btn: 0 4px 12px rgba(211, 47, 47, 0.3);
+            --shadow-card: 0 8px 24px rgba(84, 140, 146, 0.08); /* 配合主色的柔和陰影 */
+            --shadow-btn: 0 4px 12px rgba(84, 140, 146, 0.3);
             
             --font-family: 'Inter', 'Noto Sans TC', sans-serif;
         }
@@ -56,15 +56,16 @@
            ========================================= */
         .app-header {
             position: sticky; top: 0; z-index: 100;
-            background: rgba(242, 242, 247, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            background: rgba(254, 254, 234, 0.85); /* 配合鵝黃背景的毛玻璃 */
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             padding: calc(16px + env(safe-area-inset-top)) 24px 16px;
             display: flex; justify-content: space-between; align-items: flex-end;
         }
-        .app-header h1 { margin: 0; font-size: 28px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; }
+        .app-header h1 { margin: 0; font-size: 28px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
         .app-header .subtitle { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-top: 4px; display: block; }
         
         .header-actions { display: flex; align-items: center; gap: 8px; }
-        .refresh-fab { background: var(--card-bg); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-card); color: var(--text-main); font-size: 18px; }
+        .refresh-fab { background: var(--card-bg); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-card); color: var(--primary); font-size: 18px; }
 
         /* =========================================
            3. 視圖容器
@@ -76,32 +77,32 @@
            4. 記帳版面 (Bento Box 網格佈局)
            ========================================= */
         .balance-card {
-            background: linear-gradient(135deg, #1C1C1E 0%, #3A3A3C 100%);
+            background: linear-gradient(135deg, #6ba5ab 0%, var(--primary) 100%);
             border-radius: var(--radius-lg); padding: 24px; color: #FFF; margin-top: 10px; margin-bottom: 24px;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.15); position: relative; overflow: hidden;
+            box-shadow: 0 12px 32px rgba(84, 140, 146, 0.25); position: relative; overflow: hidden;
         }
-        .balance-card::after { content: ''; position: absolute; right: -20px; top: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.05); border-radius: 50%; pointer-events: none;}
+        .balance-card::after { content: ''; position: absolute; right: -20px; top: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; pointer-events: none;}
         
-        .b-title { font-size: 13px; font-weight: 600; opacity: 0.8; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;}
+        .b-title { font-size: 13px; font-weight: 600; opacity: 0.9; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;}
         .b-title-right { display: flex; align-items: center; gap: 8px; }
-        .rate-badge { background: rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 8px; font-size: 11px; backdrop-filter: blur(5px); }
         
         .stats-btn { background: rgba(255,255,255,0.2); border-radius: 8px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 16px; backdrop-filter: blur(5px); transition: 0.2s; }
         .stats-btn:active { background: rgba(255,255,255,0.4); transform: scale(0.9); }
 
         .b-amount { font-size: 40px; font-weight: 800; margin: 0 0 4px; letter-spacing: -1px; position: relative; z-index: 2;}
-        .b-sub { font-size: 15px; opacity: 0.8; font-weight: 600; position: relative; z-index: 2;}
+        .b-sub { font-size: 15px; opacity: 0.9; font-weight: 600; position: relative; z-index: 2;}
 
         /* 預算進度條 */
         .budget-wrapper { margin-top: 20px; position: relative; z-index: 2; }
-        .budget-info { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 8px; opacity: 0.9; }
-        .budget-tot { opacity: 0.6; }
-        .budget-track { height: 6px; background: rgba(255,255,255,0.15); border-radius: 99px; overflow: hidden; backdrop-filter: blur(4px); box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);}
-        .budget-fill { height: 100%; width: 0%; background: #34C759; border-radius: 99px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease; }
+        .budget-info { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; margin-bottom: 8px; opacity: 0.95; }
+        .budget-tot { opacity: 0.8; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 8px; cursor: pointer; backdrop-filter: blur(4px); transition: 0.2s;}
+        .budget-tot:active { background: rgba(255,255,255,0.3); transform: scale(0.95); }
+        .budget-track { height: 6px; background: rgba(255,255,255,0.2); border-radius: 99px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);}
+        .budget-fill { height: 100%; width: 0%; background: var(--bg-color); border-radius: 99px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease; }
 
-        .segment-wrapper { background: #E5E5EA; border-radius: 12px; display: flex; padding: 4px; margin-bottom: 20px; }
-        .seg-btn { flex: 1; text-align: center; padding: 10px 0; font-size: 13px; font-weight: 600; color: var(--text-muted); border-radius: 8px; transition: 0.2s; }
-        .seg-btn.active { background: #FFF; color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .segment-wrapper { background: var(--secondary); border-radius: 12px; display: flex; padding: 4px; margin-bottom: 20px; }
+        .seg-btn { flex: 1; text-align: center; padding: 10px 0; font-size: 14px; font-weight: 600; color: #7a7067; border-radius: 8px; transition: 0.2s; }
+        .seg-btn.active { background: #FFF; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 
         /* 日期選擇器樣式 */
         .date-picker-wrapper { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 20px; box-shadow: var(--shadow-card); display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border-color); }
@@ -110,7 +111,7 @@
         .section-title { font-size: 15px; font-weight: 800; margin: 0 0 12px; color: var(--text-main); }
         .bento-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
         .bento-box { background: var(--card-bg); border-radius: var(--radius-md); padding: 16px; text-align: center; border: 2px solid transparent; box-shadow: var(--shadow-card); transition: 0.2s; }
-        .bento-box.active { border-color: var(--primary); background: var(--primary-light); }
+        .bento-box.active { border-color: var(--primary); background: rgba(180, 215, 216, 0.2); } /* 淡化淺青色背景 */
         .bento-icon { font-size: 32px; display: block; margin-bottom: 8px; color: var(--text-main); }
         .bento-box.active .bento-icon { color: var(--primary); }
         .bento-label { font-size: 14px; font-weight: 600; color: var(--text-main); }
@@ -122,22 +123,21 @@
         .input-row input::placeholder { color: #C7C7CC; }
         
         .price-action-row { display: flex; align-items: center; justify-content: space-between; }
-        .price-input-wrapper { display: flex; align-items: center; background: #F2F2F7; border-radius: 12px; padding: 12px 16px; flex: 1; margin-right: 12px; }
-        .curr-toggle { font-weight: 800; font-size: 20px; color: var(--primary); margin-right: 12px; padding-right: 12px; border-right: 2px solid #D1D1D6; cursor: pointer; transition: 0.2s; user-select: none; }
-        .curr-toggle:active { transform: scale(0.85); opacity: 0.7; }
-        .price-input-wrapper input { font-size: 24px; font-weight: 800; width: 100%; color: var(--text-main); }
-        .price-input-wrapper input::placeholder { color: #C7C7CC; }
+        .price-input-wrapper { display: flex; align-items: center; background: rgba(224, 215, 207, 0.3); border-radius: 12px; padding: 12px 16px; flex: 1; margin-right: 12px; }
+        .curr-toggle { font-weight: 800; font-size: 20px; color: var(--primary); margin-right: 12px; padding-right: 12px; border-right: 2px solid #D1D1D6; user-select: none; }
+        .price-input-wrapper input { font-size: 24px; font-weight: 800; width: 100%; color: var(--primary); }
+        .price-input-wrapper input::placeholder { color: #C7C7CC; font-weight: 600; font-size: 18px; }
         .submit-fab { width: 54px; height: 54px; border-radius: 16px; background: var(--primary); color: #FFF; font-size: 24px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-btn); flex-shrink: 0;}
 
         .history-list { display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px;}
-        .h-item { background: var(--card-bg); padding: 16px; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-card); }
+        .h-item { background: var(--card-bg); padding: 16px; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-card); border: 1px solid var(--border-color); }
         .h-left { display: flex; align-items: center; gap: 12px; }
-        .h-icon { width: 44px; height: 44px; background: var(--bg-color); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-        .h-info h4 { margin: 0 0 4px; font-size: 15px; font-weight: 600; }
-        .h-tag { font-size: 10px; background: #E5E5EA; padding: 3px 6px; border-radius: 4px; font-weight: 800; color: var(--text-muted); }
+        .h-icon { width: 44px; height: 44px; background: rgba(224, 215, 207, 0.4); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--primary); }
+        .h-info h4 { margin: 0 0 4px; font-size: 15px; font-weight: 600; color: var(--text-main); }
+        .h-tag { font-size: 10px; background: var(--primary-light); padding: 3px 6px; border-radius: 4px; font-weight: 800; color: #2c4d51; }
         .h-right { text-align: right; }
         .h-price { font-size: 17px; font-weight: 800; color: var(--primary); margin-bottom: 2px; }
-        .h-jpy { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+        .h-cat { font-size: 12px; color: var(--text-muted); font-weight: 600; }
         .h-del { color: #FF3B30; padding: 10px; margin-left: 5px; font-size: 20px; cursor: pointer; border: none; background: none;}
 
         /* Modal / Toast */
@@ -146,22 +146,22 @@
         .modal-card { background: var(--bg-color); width: 100%; max-height: 85vh; overflow-y: auto; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1); }
         .modal-overlay.active .modal-card { transform: translateY(0); }
         
-        .pull-indicator { width: 40px; height: 5px; background: #D1D1D6; border-radius: 3px; margin: 0 auto 16px; }
+        .pull-indicator { width: 40px; height: 5px; background: var(--secondary); border-radius: 3px; margin: 0 auto 16px; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .modal-header h3 { margin: 0; font-size: 20px; font-weight: 800; color: var(--text-main); }
-        .close-btn { background: #E5E5EA; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: var(--text-main); font-size: 16px; cursor: pointer; border: none;}
+        .modal-header h3 { margin: 0; font-size: 20px; font-weight: 800; color: var(--primary); }
+        .close-btn { background: var(--secondary); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: var(--text-main); font-size: 16px; cursor: pointer; border: none;}
         
-        .stat-item { background: var(--card-bg); padding: 16px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; box-shadow: var(--shadow-card); }
+        .stat-item { background: var(--card-bg); padding: 16px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; box-shadow: var(--shadow-card); border: 1px solid var(--border-color); }
         .stat-left { display: flex; align-items: center; gap: 12px; }
-        .stat-icon { width: 44px; height: 44px; background: var(--primary-light); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .stat-icon { width: 44px; height: 44px; background: rgba(180, 215, 216, 0.3); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
         .stat-info h4 { margin: 0 0 4px; font-size: 15px; font-weight: 600; color: var(--text-main); }
         .stat-percent { font-size: 12px; color: var(--text-muted); font-weight: 600; }
         .stat-right { text-align: right; }
-        .s-twd { font-size: 17px; font-weight: 800; color: var(--text-main); display: block; margin-bottom: 2px;}
-        .s-jpy { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+        .s-twd { font-size: 17px; font-weight: 800; color: var(--primary); display: block;}
 
         .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; pointer-events: none;}
-        .toast { background: rgba(28, 28, 30, 0.95); backdrop-filter: blur(10px); color: #FFF; padding: 14px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 12px; animation: toastIn 0.3s forwards; }
+        .toast { background: rgba(84, 140, 146, 0.95); backdrop-filter: blur(10px); color: #FFF; padding: 14px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; animation: toastIn 0.3s forwards; }
+        .toast.error { background: rgba(211, 47, 47, 0.95); }
         @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -169,8 +169,8 @@
 
     <header class="app-header">
         <div>
-            <h1>情侶記帳本</h1>
-            <span class="subtitle">共同理財小幫手</span>
+            <h1>噗噗記帳本</h1>
+            <span class="subtitle">專屬理財小天地</span>
         </div>
         <div class="header-actions">
             <button class="refresh-fab" onclick="manualSync()">
@@ -184,21 +184,23 @@
             
             <div class="balance-card">
                 <div class="b-title">
-                    <span>當月總花費 (Total Expenses)</span>
+                    <span>當月總計花費</span>
                     <div class="b-title-right">
-                        <span class="rate-badge" id="rate-display">匯率 0.21</span>
                         <button class="stats-btn" onclick="openStatsModal()">
                             <i class="ph-bold ph-chart-pie-slice"></i>
                         </button>
                     </div>
                 </div>
                 <h2 class="b-amount" id="total-primary">NT$ 0</h2>
-                <div class="b-sub" id="total-secondary">≈ ¥ 0</div>
+                <div class="b-sub" id="total-secondary">以選取日期的月份計算</div>
 
                 <div class="budget-wrapper">
                     <div class="budget-info">
-                        <span id="budget-rem-label">剩餘 NT$ 30,000</span>
-                        <span class="budget-tot">/ 30k 每月預算</span>
+                        <span id="budget-rem-label">剩餘 NT$ 15,000</span>
+                        <span class="budget-tot" onclick="editBudget()">
+                            <span id="budget-total-label">/ 15k 每月預算</span>
+                            <i class="ph-bold ph-pencil-simple"></i>
+                        </span>
                     </div>
                     <div class="budget-track">
                         <div class="budget-fill" id="budget-fill"></div>
@@ -211,9 +213,9 @@
             </div>
 
             <div class="segment-wrapper" id="person-segment">
-                <button class="seg-btn active" onclick="selectPerson('', this)">👥 共用</button>
-                <button class="seg-btn" onclick="selectPerson('我', this)">👩🏻 我</button>
-                <button class="seg-btn" onclick="selectPerson('男友', this)">👦🏻 男友</button>
+                <button class="seg-btn active" onclick="selectPerson('', this)">👥 噗噗</button>
+                <button class="seg-btn" onclick="selectPerson('廖噗', this)">👩🏻 廖噗</button>
+                <button class="seg-btn" onclick="selectPerson('陳噗', this)">👦🏻 陳噗</button>
             </div>
 
             <h3 class="section-title">選擇分類</h3>
@@ -244,8 +246,8 @@
 
                 <div class="price-action-row">
                     <div class="price-input-wrapper">
-                        <div class="curr-toggle" id="curr-toggle" onclick="toggleCurrency()" style="color: var(--secondary);">$</div>
-                        <input type="number" id="item-price" placeholder="輸入台幣金額" min="0" step="0.01">
+                        <div class="curr-toggle">$</div>
+                        <input type="number" id="item-price" placeholder="輸入金額" min="0" step="1">
                     </div>
                     <button class="submit-fab" onclick="addExpense()"><i class="ph-bold ph-plus"></i></button>
                 </div>
@@ -260,7 +262,7 @@
         <div class="modal-card" onclick="event.stopPropagation()">
             <div class="pull-indicator"></div>
             <div class="modal-header">
-                <h3>分類花費統計</h3>
+                <h3>當月分類統計</h3>
                 <button onclick="closeStatsModal()" class="close-btn"><i class="ph-bold ph-x"></i></button>
             </div>
             <div id="stats-content"></div>
@@ -284,16 +286,11 @@
 
         const Store = {
             state: {
-                rate: parseFloat(localStorage.getItem('cached_rate')) || 0.21, 
                 expenses: getSafeStorage('cached_expenses', []),
+                budget: parseInt(localStorage.getItem('monthly_budget')) || 15000,
                 date: '',
                 person: '',     
-                category: '交通',
-                currency: 'TWD' // 預設使用台幣
-            },
-            updateRate(newRate) {
-                this.state.rate = newRate;
-                localStorage.setItem('cached_rate', newRate);
+                category: '交通'
             },
             updateExpenses(newData) {
                 this.state.expenses = newData;
@@ -302,13 +299,11 @@
         };
 
         const EMOJI_MAP = { '交通': 'ph-train', '食物': 'ph-hamburger', '購物': 'ph-shopping-bag', '其他': 'ph-ticket' };
-        const MONTHLY_BUDGET = 30000; // 每月總預算設定
 
         document.addEventListener('DOMContentLoaded', () => {
             // 初始化日期選擇器為今天
             const dateInput = document.getElementById('expense-date');
             const today = new Date();
-            // 轉換為 YYYY-MM-DD 格式
             const localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
             dateInput.value = localDate;
             Store.state.date = localDate;
@@ -318,8 +313,6 @@
                 Store.state.date = e.target.value;
                 renderExpenses();
             });
-
-            fetchExchangeRate();
             
             try {
                 renderExpenses();
@@ -341,45 +334,60 @@
             el.classList.add('active');
         }
 
-        function toggleCurrency() {
-            const toggleBtn = document.getElementById('curr-toggle');
-            const inputField = document.getElementById('item-price');
-            
-            if (Store.state.currency === 'TWD') {
-                Store.state.currency = 'JPY';
-                toggleBtn.innerText = '¥';
-                toggleBtn.style.color = 'var(--primary)';
-                inputField.placeholder = "輸入日幣金額";
-            } else {
-                Store.state.currency = 'TWD';
-                toggleBtn.innerText = '$';
-                toggleBtn.style.color = 'var(--secondary)';
-                inputField.placeholder = "輸入台幣金額";
+        function editBudget() {
+            const current = Store.state.budget;
+            const input = prompt("請輸入您的每月預算金額：", current);
+            if (input !== null) {
+                const num = parseInt(input.replace(/[^\d]/g, ''), 10);
+                if (!isNaN(num) && num > 0) {
+                    Store.state.budget = num;
+                    localStorage.setItem('monthly_budget', num);
+                    renderExpenses();
+                    showToast('預算已更新');
+                } else {
+                    showToast('請輸入有效數字', 'error');
+                }
             }
         }
 
         function manualSync() {
             showToast('正在同步資料...', 'success');
             fetchExpenses();
-            fetchExchangeRate();
         }
 
+        // Modal 統計現在也依照「當月」去計算
         function openStatsModal() {
+            const targetDateObj = new Date(Store.state.date);
+            const targetY = targetDateObj.getFullYear();
+            const targetM = targetDateObj.getMonth() + 1;
+
             const container = document.getElementById('stats-content');
             let stats = { '交通': 0, '食物': 0, '購物': 0, '其他': 0 };
             let totalTWD = 0;
             
             Store.state.expenses.forEach(item => {
-                let price = Math.round(parseFloat(item.price) || 0);
-                stats[item.cat] = (stats[item.cat] || 0) + price;
-                totalTWD += price;
+                const sheetDate = String(item.date).trim();
+                let isSameMonth = false;
+                if (sheetDate.includes('-') || sheetDate.includes('/')) {
+                    const itemDateObj = new Date(sheetDate);
+                    if(!isNaN(itemDateObj.getTime())) {
+                        isSameMonth = (itemDateObj.getFullYear() === targetY && itemDateObj.getMonth() + 1 === targetM);
+                    }
+                } else if (sheetDate === Store.state.date) {
+                    isSameMonth = true;
+                }
+
+                if (isSameMonth) {
+                    let price = Math.round(parseFloat(item.price) || 0);
+                    stats[item.cat] = (stats[item.cat] || 0) + price;
+                    totalTWD += price;
+                }
             });
 
             let html = '';
             const cats = ['交通', '食物', '購物', '其他'];
             cats.forEach(cat => {
                 let valTWD = stats[cat];
-                let valJPY = Math.round(valTWD / Store.state.rate);
                 let icon = EMOJI_MAP[cat] || 'ph-ticket';
                 let percent = totalTWD === 0 ? 0 : Math.round((valTWD / totalTWD) * 100);
                 
@@ -394,7 +402,6 @@
                     </div>
                     <div class="stat-right">
                         <span class="s-twd">$${valTWD.toLocaleString()}</span>
-                        <span class="s-jpy">≈ ¥${valJPY.toLocaleString()}</span>
                     </div>
                 </div>`;
             });
@@ -419,26 +426,43 @@
         }
 
         function renderExpenses() {
-            let totalTWD = 0;
             const listEl = document.getElementById('expense-list');
             listEl.innerHTML = '';
             
-            // 將選擇的日期轉為與資料庫好比對的格式 (支援 2026-05-22 或 5/22 等格式)
+            // 解析目前選取的日期
             const targetDateObj = new Date(Store.state.date);
+            const targetY = targetDateObj.getFullYear();
             const targetM = targetDateObj.getMonth() + 1;
             const targetD = targetDateObj.getDate();
-            const targetShortDate = `${targetM}/${targetD}`; // 例如: 5/22
+            const targetShortDate = `${targetM}/${targetD}`; 
 
-            const selectedDayItems = Store.state.expenses.filter(item => {
+            let monthlyTotal = 0;
+            const selectedDayItems = [];
+
+            // 同時計算「當天花費紀錄」與「當月總計金額」
+            Store.state.expenses.forEach(item => {
                 const sheetDate = String(item.date).trim();
+                let isSameMonth = false;
+                let isSameDay = false;
                 
-                if (sheetDate === Store.state.date || sheetDate === targetShortDate || sheetDate.includes(targetShortDate)) return true;
-                
-                if (sheetDate.includes('T') || sheetDate.includes('-')) {
+                if (sheetDate.includes('T') || sheetDate.includes('-') || sheetDate.includes('/')) {
                     const d = new Date(sheetDate);
-                    return (d.getMonth() + 1) === targetM && d.getDate() === targetD;
+                    if(!isNaN(d.getTime())) {
+                        isSameMonth = (d.getFullYear() === targetY && d.getMonth() + 1 === targetM);
+                        isSameDay = (isSameMonth && d.getDate() === targetD);
+                    } else if (sheetDate === targetShortDate || sheetDate.includes(targetShortDate)) {
+                        isSameDay = true;
+                        isSameMonth = true;
+                    }
+                } else if (sheetDate === Store.state.date) {
+                    isSameDay = true;
+                    isSameMonth = true;
                 }
-                return false;
+
+                const price = Math.round(parseFloat(item.price) || 0);
+
+                if (isSameMonth) monthlyTotal += price;
+                if (isSameDay) selectedDayItems.push(item);
             });
 
             if (selectedDayItems.length === 0) {
@@ -463,7 +487,7 @@
                             <div class="h-icon"><i class="ph-fill ${icon}"></i></div>
                             <div class="h-info">
                                 <h4>${displayName} ${personTagHtml}</h4>
-                                <span class="h-jpy">${item.cat}</span>
+                                <span class="h-cat">${item.cat}</span>
                             </div>
                         </div>
                         <div class="h-right">
@@ -473,17 +497,15 @@
                     </div>`;
                 });
             }
-
-            // 計算全域總花費 (所有紀錄，可用於計算月總花費)
-            Store.state.expenses.forEach(item => { totalTWD += Math.round(parseFloat(item.price) || 0); });
-            const totalJPY = Math.round(totalTWD / Store.state.rate);
             
-            document.getElementById('total-primary').innerText = `NT$ ${totalTWD.toLocaleString()}`;
-            document.getElementById('total-secondary').innerText = `≈ ¥ ${totalJPY.toLocaleString()}`;
+            // 更新上方總金額卡片與進度條
+            document.getElementById('total-primary').innerText = `NT$ ${monthlyTotal.toLocaleString()}`;
+            
+            let currentBudget = Store.state.budget;
+            document.getElementById('budget-total-label').innerText = `/ ${(currentBudget/1000).toFixed(1).replace('.0','')}k 每月預算`;
 
-            // 預算進度條
-            let spentPercent = (totalTWD / MONTHLY_BUDGET) * 100;
-            let remaining = MONTHLY_BUDGET - totalTWD;
+            let spentPercent = (monthlyTotal / currentBudget) * 100;
+            let remaining = currentBudget - monthlyTotal;
             const fillEl = document.getElementById('budget-fill');
             const remLabel = document.getElementById('budget-rem-label');
 
@@ -491,23 +513,13 @@
 
             if (remaining >= 0) {
                 remLabel.innerText = `剩餘 NT$ ${remaining.toLocaleString()}`;
-                remLabel.style.color = 'rgba(255,255,255,0.8)';
-                fillEl.style.background = spentPercent > 85 ? '#FF9500' : '#34C759'; // 接近超支時顯示橘色
+                remLabel.style.color = 'rgba(255,255,255,0.95)';
+                fillEl.style.background = spentPercent > 85 ? '#e0d7cf' : 'var(--bg-color)'; 
             } else {
                 remLabel.innerText = `超支 NT$ ${Math.abs(remaining).toLocaleString()}`;
-                remLabel.style.color = '#FF4B4B';
-                fillEl.style.background = '#FF4B4B';
+                remLabel.style.color = '#ffb3b3'; // 柔和的紅色警示
+                fillEl.style.background = '#ffb3b3';
             }
-        }
-
-        async function fetchExchangeRate() {
-            try {
-                const res = await fetch('https://open.er-api.com/v6/latest/JPY');
-                const data = await res.json();
-                if (data?.rates?.TWD) Store.updateRate(data.rates.TWD);
-            } catch (e) { console.warn('匯率更新失敗'); }
-            document.getElementById('rate-display').innerText = `匯率 ${Store.state.rate.toFixed(4)}`;
-            renderExpenses();
         }
 
         async function fetchExpenses() {
@@ -531,11 +543,9 @@
             let baseName = nameEl.value.trim() || Store.state.category;
             let finalName = Store.state.person ? `【${Store.state.person}】${baseName}` : baseName;
             
-            const finalPriceTWD = Store.state.currency === 'JPY' ? Math.round(inputPrice * Store.state.rate) : Math.round(inputPrice); 
-            
             const newId = Date.now().toString();
-            // 存入時格式轉為 YYYY-MM-DD
-            const newExpenseObj = { id: newId, date: Store.state.date, cat: Store.state.category, name: finalName, price: finalPriceTWD };
+            // 存入時格式統一為 YYYY-MM-DD
+            const newExpenseObj = { id: newId, date: Store.state.date, cat: Store.state.category, name: finalName, price: Math.round(inputPrice) };
             
             Store.updateExpenses([...Store.state.expenses, newExpenseObj]);
             renderExpenses();
