@@ -17,23 +17,24 @@
 
     <style>
         /* =========================================
-           1. 現代原生 App 變數設定 (您指定的質感色票)
+           1. 現代原生 App 變數設定 (莫蘭迪色票)
            ========================================= */
         :root {
-            --bg-color: #fefeea;       /* 鵝黃色 (背景) */
-            --card-bg: #FFFFFF;        /* 純白 (卡片) */
-            --primary: #548c92;        /* 深青色 (主色調、按鈕) */
-            --primary-light: #b4d7d8;  /* 淺青色 (選取狀態、副色) */
-            --secondary: #e0d7cf;      /* 暖灰/奶茶色 (分頁背景、邊框) */
+            --bg-color: #fefeea;       
+            --card-bg: #FFFFFF;        
+            --primary: #548c92;        
+            --primary-light: #b4d7d8;  
+            --secondary: #e0d7cf;      
             --text-main: #1C1C1E;
             --text-muted: #8E8E93;
             --border-color: rgba(224, 215, 207, 0.6); 
+            --income-color: #4CAF50; /* 柔和的綠色用於收入 */
             
             --radius-lg: 24px;
             --radius-md: 16px;
             --radius-sm: 10px;
             
-            --shadow-card: 0 8px 24px rgba(84, 140, 146, 0.08); /* 配合主色的柔和陰影 */
+            --shadow-card: 0 8px 24px rgba(84, 140, 146, 0.08); 
             --shadow-btn: 0 4px 12px rgba(84, 140, 146, 0.3);
             
             --font-family: 'Inter', 'Noto Sans TC', sans-serif;
@@ -43,7 +44,7 @@
 
         body { 
             margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-main);
-            padding-bottom: calc(40px + env(safe-area-inset-bottom));
+            padding-bottom: calc(90px + env(safe-area-inset-bottom)); /* 預留底部導覽列空間 */
             overscroll-behavior-y: none;
         }
 
@@ -56,10 +57,11 @@
            ========================================= */
         .app-header {
             position: sticky; top: 0; z-index: 100;
-            background: rgba(254, 254, 234, 0.85); /* 配合鵝黃背景的毛玻璃 */
+            background: rgba(254, 254, 234, 0.85); 
             backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             padding: calc(16px + env(safe-area-inset-top)) 24px 16px;
             display: flex; justify-content: space-between; align-items: flex-end;
+            border-bottom: 1px solid rgba(84, 140, 146, 0.05);
         }
         .app-header h1 { margin: 0; font-size: 28px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
         .app-header .subtitle { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-top: 4px; display: block; }
@@ -68,13 +70,29 @@
         .refresh-fab { background: var(--card-bg); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-card); color: var(--primary); font-size: 18px; }
 
         /* =========================================
-           3. 視圖容器
+           3. 底部導覽列 (Bottom Tab Bar)
            ========================================= */
-        .view-container { display: block; padding: 0 20px; animation: fadeIn 0.3s ease forwards; }
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(254, 254, 234, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(84, 140, 146, 0.1); z-index: 999;
+            display: flex; justify-content: space-around; padding: 12px 10px calc(12px + env(safe-area-inset-bottom));
+        }
+        .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #a1a1a6; }
+        .tab-btn i { font-size: 26px; transition: 0.2s; }
+        .tab-btn span { font-size: 11px; font-weight: 800; }
+        .tab-btn.active { color: var(--primary); }
+        .tab-btn.active i { transform: translateY(-2px); }
+
+        /* =========================================
+           4. 視圖容器 (Pages)
+           ========================================= */
+        .view-container { display: none; padding: 0 20px; animation: fadeIn 0.3s ease forwards; }
+        .view-container.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* =========================================
-           4. 記帳版面 (Bento Box 網格佈局)
+           5. 記帳版面 (Home)
            ========================================= */
         .balance-card {
             background: linear-gradient(135deg, #6ba5ab 0%, var(--primary) 100%);
@@ -83,16 +101,10 @@
         }
         .balance-card::after { content: ''; position: absolute; right: -20px; top: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; pointer-events: none;}
         
-        .b-title { font-size: 13px; font-weight: 600; opacity: 0.9; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;}
-        .b-title-right { display: flex; align-items: center; gap: 8px; }
-        
-        .stats-btn { background: rgba(255,255,255,0.2); border-radius: 8px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 16px; backdrop-filter: blur(5px); transition: 0.2s; }
-        .stats-btn:active { background: rgba(255,255,255,0.4); transform: scale(0.9); }
-
+        .b-title { font-size: 13px; font-weight: 600; opacity: 0.9; margin-bottom: 8px; }
         .b-amount { font-size: 40px; font-weight: 800; margin: 0 0 4px; letter-spacing: -1px; position: relative; z-index: 2;}
         .b-sub { font-size: 15px; opacity: 0.9; font-weight: 600; position: relative; z-index: 2;}
 
-        /* 預算進度條 */
         .budget-wrapper { margin-top: 20px; position: relative; z-index: 2; }
         .budget-info { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; margin-bottom: 8px; opacity: 0.95; }
         .budget-tot { opacity: 0.8; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 8px; cursor: pointer; backdrop-filter: blur(4px); transition: 0.2s;}
@@ -100,22 +112,29 @@
         .budget-track { height: 6px; background: rgba(255,255,255,0.2); border-radius: 99px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);}
         .budget-fill { height: 100%; width: 0%; background: var(--bg-color); border-radius: 99px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease; }
 
+        .date-picker-wrapper { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow-card); display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border-color); }
+        .date-picker-wrapper input { font-size: 16px; font-weight: 600; color: var(--text-main); width: 100%; background: transparent; }
+
+        .type-segment { display: flex; gap: 8px; margin-bottom: 20px; }
+        .type-btn { flex: 1; text-align: center; padding: 12px 0; font-size: 15px; font-weight: 800; border-radius: 12px; transition: 0.2s; background: var(--secondary); color: #7a7067; border: 2px solid transparent;}
+        .type-btn.active.expense { background: var(--card-bg); color: var(--primary); border-color: var(--primary); box-shadow: var(--shadow-card); }
+        .type-btn.active.income { background: var(--card-bg); color: var(--income-color); border-color: var(--income-color); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2); }
+
         .segment-wrapper { background: var(--secondary); border-radius: 12px; display: flex; padding: 4px; margin-bottom: 20px; }
         .seg-btn { flex: 1; text-align: center; padding: 10px 0; font-size: 14px; font-weight: 600; color: #7a7067; border-radius: 8px; transition: 0.2s; }
         .seg-btn.active { background: #FFF; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 
-        /* 日期選擇器樣式 */
-        .date-picker-wrapper { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 20px; box-shadow: var(--shadow-card); display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border-color); }
-        .date-picker-wrapper input { font-size: 16px; font-weight: 600; color: var(--text-main); width: 100%; background: transparent; }
-
         .section-title { font-size: 15px; font-weight: 800; margin: 0 0 12px; color: var(--text-main); }
         .bento-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
         .bento-box { background: var(--card-bg); border-radius: var(--radius-md); padding: 16px; text-align: center; border: 2px solid transparent; box-shadow: var(--shadow-card); transition: 0.2s; }
-        .bento-box.active { border-color: var(--primary); background: rgba(180, 215, 216, 0.2); } /* 淡化淺青色背景 */
+        .bento-box.active { border-color: var(--primary); background: rgba(180, 215, 216, 0.2); }
+        .bento-box.active.income-cat { border-color: var(--income-color); background: rgba(76, 175, 80, 0.1); }
         .bento-icon { font-size: 32px; display: block; margin-bottom: 8px; color: var(--text-main); }
         .bento-box.active .bento-icon { color: var(--primary); }
+        .bento-box.active.income-cat .bento-icon { color: var(--income-color); }
         .bento-label { font-size: 14px; font-weight: 600; color: var(--text-main); }
         .bento-box.active .bento-label { color: var(--primary); }
+        .bento-box.active.income-cat .bento-label { color: var(--income-color); }
 
         .input-composite { background: var(--card-bg); border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow-card); margin-bottom: 30px; border: 1px solid var(--border-color); }
         .input-row { display: flex; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 12px; }
@@ -123,41 +142,49 @@
         .input-row input::placeholder { color: #C7C7CC; }
         
         .price-action-row { display: flex; align-items: center; justify-content: space-between; }
-        .price-input-wrapper { display: flex; align-items: center; background: rgba(224, 215, 207, 0.3); border-radius: 12px; padding: 12px 16px; flex: 1; margin-right: 12px; }
-        .curr-toggle { font-weight: 800; font-size: 20px; color: var(--primary); margin-right: 12px; padding-right: 12px; border-right: 2px solid #D1D1D6; user-select: none; }
-        .price-input-wrapper input { font-size: 24px; font-weight: 800; width: 100%; color: var(--primary); }
+        .price-input-wrapper { display: flex; align-items: center; background: rgba(224, 215, 207, 0.3); border-radius: 12px; padding: 12px 16px; flex: 1; margin-right: 12px; transition: 0.3s;}
+        .curr-toggle { font-weight: 800; font-size: 20px; color: var(--primary); margin-right: 12px; padding-right: 12px; border-right: 2px solid #D1D1D6; user-select: none; transition: 0.3s;}
+        .price-input-wrapper input { font-size: 24px; font-weight: 800; width: 100%; color: var(--primary); transition: 0.3s;}
         .price-input-wrapper input::placeholder { color: #C7C7CC; font-weight: 600; font-size: 18px; }
-        .submit-fab { width: 54px; height: 54px; border-radius: 16px; background: var(--primary); color: #FFF; font-size: 24px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-btn); flex-shrink: 0;}
+        .submit-fab { width: 54px; height: 54px; border-radius: 16px; background: var(--primary); color: #FFF; font-size: 24px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-btn); flex-shrink: 0; transition: 0.3s;}
 
         .history-list { display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px;}
         .h-item { background: var(--card-bg); padding: 16px; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-card); border: 1px solid var(--border-color); }
         .h-left { display: flex; align-items: center; gap: 12px; }
         .h-icon { width: 44px; height: 44px; background: rgba(224, 215, 207, 0.4); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--primary); }
+        .h-icon.inc { background: rgba(76, 175, 80, 0.1); color: var(--income-color); }
         .h-info h4 { margin: 0 0 4px; font-size: 15px; font-weight: 600; color: var(--text-main); }
         .h-tag { font-size: 10px; background: var(--primary-light); padding: 3px 6px; border-radius: 4px; font-weight: 800; color: #2c4d51; }
         .h-right { text-align: right; }
         .h-price { font-size: 17px; font-weight: 800; color: var(--primary); margin-bottom: 2px; }
+        .h-price.inc { color: var(--income-color); }
         .h-cat { font-size: 12px; color: var(--text-muted); font-weight: 600; }
         .h-del { color: #FF3B30; padding: 10px; margin-left: 5px; font-size: 20px; cursor: pointer; border: none; background: none;}
 
-        /* Modal / Toast */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; display: flex; align-items: flex-end; }
-        .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-card { background: var(--bg-color); width: 100%; max-height: 85vh; overflow-y: auto; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1); }
-        .modal-overlay.active .modal-card { transform: translateY(0); }
-        
-        .pull-indicator { width: 40px; height: 5px; background: var(--secondary); border-radius: 3px; margin: 0 auto 16px; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .modal-header h3 { margin: 0; font-size: 20px; font-weight: 800; color: var(--primary); }
-        .close-btn { background: var(--secondary); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: var(--text-main); font-size: 16px; cursor: pointer; border: none;}
-        
-        .stat-item { background: var(--card-bg); padding: 16px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; box-shadow: var(--shadow-card); border: 1px solid var(--border-color); }
-        .stat-left { display: flex; align-items: center; gap: 12px; }
-        .stat-icon { width: 44px; height: 44px; background: rgba(180, 215, 216, 0.3); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        .stat-info h4 { margin: 0 0 4px; font-size: 15px; font-weight: 600; color: var(--text-main); }
-        .stat-percent { font-size: 12px; color: var(--text-muted); font-weight: 600; }
-        .stat-right { text-align: right; }
-        .s-twd { font-size: 17px; font-weight: 800; color: var(--primary); display: block;}
+        /* =========================================
+           6. 分析版面 (Analysis Dashboard)
+           ========================================= */
+        .dash-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .dash-card { background: var(--card-bg); padding: 16px; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); border: 1px solid var(--border-color); }
+        .dash-card.full { grid-column: span 2; background: linear-gradient(135deg, #FFF 0%, #f9f9f9 100%); text-align: center;}
+        .dc-title { font-size: 12px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .dc-val { font-size: 22px; font-weight: 800; color: var(--text-main); }
+        .dc-val.inc { color: var(--income-color); }
+        .dc-val.exp { color: var(--primary); }
+        .dc-val.net { font-size: 32px; color: var(--text-main); }
+
+        .chart-section { background: var(--card-bg); padding: 20px; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); border: 1px solid var(--border-color); margin-bottom: 24px; }
+        .chart-row { margin-bottom: 16px; }
+        .chart-row:last-child { margin-bottom: 0; }
+        .cr-top { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        .cr-name { display: flex; align-items: center; gap: 6px; color: var(--text-main); }
+        .cr-val { color: var(--text-muted); }
+        .cr-track { height: 8px; background: rgba(224, 215, 207, 0.5); border-radius: 4px; overflow: hidden; }
+        .cr-fill { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.8s ease; }
+        .cr-fill.inc { background: var(--income-color); }
+        .cr-fill.p1 { background: #548c92; } /* 噗噗 */
+        .cr-fill.p2 { background: #b4d7d8; } /* 廖噗 */
+        .cr-fill.p3 { background: #e0d7cf; } /* 陳噗 */
 
         .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; pointer-events: none;}
         .toast { background: rgba(84, 140, 146, 0.95); backdrop-filter: blur(10px); color: #FFF; padding: 14px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; animation: toastIn 0.3s forwards; }
@@ -169,7 +196,7 @@
 
     <header class="app-header">
         <div>
-            <h1>噗噗記帳本</h1>
+            <h1 id="header-title">噗噗記帳本</h1>
             <span class="subtitle">專屬理財小天地</span>
         </div>
         <div class="header-actions">
@@ -180,19 +207,12 @@
     </header>
 
     <main>
-        <section id="view-accounting" class="view-container">
+        <section id="view-accounting" class="view-container active">
             
             <div class="balance-card">
-                <div class="b-title">
-                    <span>當月總計花費</span>
-                    <div class="b-title-right">
-                        <button class="stats-btn" onclick="openStatsModal()">
-                            <i class="ph-bold ph-chart-pie-slice"></i>
-                        </button>
-                    </div>
-                </div>
+                <div class="b-title">當月累計支出 (不含收入)</div>
                 <h2 class="b-amount" id="total-primary">NT$ 0</h2>
-                <div class="b-sub" id="total-secondary">以選取日期的月份計算</div>
+                <div class="b-sub">以選取日期的月份計算</div>
 
                 <div class="budget-wrapper">
                     <div class="budget-info">
@@ -212,29 +232,46 @@
                 <input type="date" id="expense-date">
             </div>
 
+            <div class="type-segment">
+                <button class="type-btn active expense" id="btn-type-exp" onclick="setRecordType('expense')">支出</button>
+                <button class="type-btn" id="btn-type-inc" onclick="setRecordType('income')">收入</button>
+            </div>
+
             <div class="segment-wrapper" id="person-segment">
                 <button class="seg-btn active" onclick="selectPerson('', this)">👥 噗噗</button>
                 <button class="seg-btn" onclick="selectPerson('廖噗', this)">👩🏻 廖噗</button>
                 <button class="seg-btn" onclick="selectPerson('陳噗', this)">👦🏻 陳噗</button>
             </div>
 
-            <h3 class="section-title">選擇分類</h3>
-            <div class="bento-grid" id="category-container">
+            <h3 class="section-title" id="cat-title">選擇支出分類</h3>
+            
+            <div class="bento-grid" id="cat-expense-grid">
                 <button class="bento-box active" onclick="selectCategory('交通', this)">
-                    <i class="ph-fill ph-train bento-icon"></i>
-                    <span class="bento-label">交通</span>
+                    <i class="ph-fill ph-train bento-icon"></i><span class="bento-label">交通</span>
                 </button>
                 <button class="bento-box" onclick="selectCategory('食物', this)">
-                    <i class="ph-fill ph-hamburger bento-icon"></i>
-                    <span class="bento-label">食物</span>
+                    <i class="ph-fill ph-hamburger bento-icon"></i><span class="bento-label">食物</span>
                 </button>
                 <button class="bento-box" onclick="selectCategory('購物', this)">
-                    <i class="ph-fill ph-shopping-bag bento-icon"></i>
-                    <span class="bento-label">購物</span>
+                    <i class="ph-fill ph-shopping-bag bento-icon"></i><span class="bento-label">購物</span>
                 </button>
                 <button class="bento-box" onclick="selectCategory('其他', this)">
-                    <i class="ph-fill ph-ticket bento-icon"></i>
-                    <span class="bento-label">其他</span>
+                    <i class="ph-fill ph-ticket bento-icon"></i><span class="bento-label">其他</span>
+                </button>
+            </div>
+
+            <div class="bento-grid" id="cat-income-grid" style="display: none;">
+                <button class="bento-box income-cat active" onclick="selectCategory('薪水', this)">
+                    <i class="ph-fill ph-money bento-icon"></i><span class="bento-label">薪水</span>
+                </button>
+                <button class="bento-box income-cat" onclick="selectCategory('獎金', this)">
+                    <i class="ph-fill ph-gift bento-icon"></i><span class="bento-label">獎金</span>
+                </button>
+                <button class="bento-box income-cat" onclick="selectCategory('轉帳', this)">
+                    <i class="ph-fill ph-bank bento-icon"></i><span class="bento-label">轉帳</span>
+                </button>
+                <button class="bento-box income-cat" onclick="selectCategory('其他入帳', this)">
+                    <i class="ph-fill ph-piggy-bank bento-icon"></i><span class="bento-label">其他</span>
                 </button>
             </div>
 
@@ -245,29 +282,58 @@
                 </div>
 
                 <div class="price-action-row">
-                    <div class="price-input-wrapper">
-                        <div class="curr-toggle">$</div>
+                    <div class="price-input-wrapper" id="input-wrapper">
+                        <div class="curr-toggle" id="curr-symbol">$</div>
                         <input type="number" id="item-price" placeholder="輸入金額" min="0" step="1">
                     </div>
-                    <button class="submit-fab" onclick="addExpense()"><i class="ph-bold ph-plus"></i></button>
+                    <button class="submit-fab" id="submit-btn" onclick="addExpense()"><i class="ph-bold ph-plus"></i></button>
                 </div>
             </div>
 
             <h3 class="section-title">本日紀錄</h3>
             <div id="expense-list" class="history-list"></div>
         </section>
+
+        <section id="view-analysis" class="view-container">
+            <div class="date-picker-wrapper" style="margin-top: 10px;">
+                <input type="month" id="analysis-month">
+            </div>
+
+            <div class="dash-summary">
+                <div class="dash-card full">
+                    <span class="dc-title">當月淨結餘 (收入 - 支出)</span>
+                    <div class="dc-val net" id="dash-net">$0</div>
+                </div>
+                <div class="dash-card">
+                    <span class="dc-title">總收入</span>
+                    <div class="dc-val inc" id="dash-inc">$0</div>
+                </div>
+                <div class="dash-card">
+                    <span class="dc-title">總支出</span>
+                    <div class="dc-val exp" id="dash-exp">$0</div>
+                </div>
+            </div>
+
+            <h3 class="section-title">成員花費比例 (僅計算支出)</h3>
+            <div class="chart-section" id="member-chart-container">
+                </div>
+
+            <h3 class="section-title">支出分類排行</h3>
+            <div class="chart-section" id="cat-chart-container">
+                </div>
+        </section>
     </main>
 
-    <div class="modal-overlay" id="stats-modal" onclick="closeStatsModal()">
-        <div class="modal-card" onclick="event.stopPropagation()">
-            <div class="pull-indicator"></div>
-            <div class="modal-header">
-                <h3>當月分類統計</h3>
-                <button onclick="closeStatsModal()" class="close-btn"><i class="ph-bold ph-x"></i></button>
-            </div>
-            <div id="stats-content"></div>
-        </div>
-    </div>
+    <nav class="bottom-nav">
+        <button class="tab-btn active" id="tab-accounting" onclick="switchTab('accounting')">
+            <i class="ph-fill ph-wallet"></i>
+            <span>記帳</span>
+        </button>
+        <button class="tab-btn" id="tab-analysis" onclick="switchTab('analysis')">
+            <i class="ph-fill ph-chart-pie-slice"></i>
+            <span>分析</span>
+        </button>
+    </nav>
 
     <div id="toast-container" class="toast-container"></div>
 
@@ -279,7 +345,6 @@
                 const val = localStorage.getItem(key);
                 return val ? JSON.parse(val) : defaultVal;
             } catch (e) {
-                console.error("Storage Error:", e);
                 return defaultVal;
             }
         }
@@ -288,9 +353,11 @@
             state: {
                 expenses: getSafeStorage('cached_expenses', []),
                 budget: parseInt(localStorage.getItem('monthly_budget')) || 15000,
-                date: '',
+                date: '',           // YYYY-MM-DD
+                analysisMonth: '',  // YYYY-MM
                 person: '',     
-                category: '交通'
+                category: '交通',
+                recordType: 'expense' // 'expense' or 'income'
             },
             updateExpenses(newData) {
                 this.state.expenses = newData;
@@ -298,29 +365,100 @@
             }
         };
 
-        const EMOJI_MAP = { '交通': 'ph-train', '食物': 'ph-hamburger', '購物': 'ph-shopping-bag', '其他': 'ph-ticket' };
+        const EMOJI_MAP = { 
+            '交通': 'ph-train', '食物': 'ph-hamburger', '購物': 'ph-shopping-bag', '其他': 'ph-ticket',
+            '薪水': 'ph-money', '獎金': 'ph-gift', '轉帳': 'ph-bank', '其他入帳': 'ph-piggy-bank'
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
-            // 初始化日期選擇器為今天
+            // 初始化日期
             const dateInput = document.getElementById('expense-date');
+            const monthInput = document.getElementById('analysis-month');
             const today = new Date();
-            const localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            
+            const localDate = `${yyyy}-${mm}-${dd}`;
+            const localMonth = `${yyyy}-${mm}`;
+            
             dateInput.value = localDate;
+            monthInput.value = localMonth;
+            
             Store.state.date = localDate;
+            Store.state.analysisMonth = localMonth;
 
-            // 監聽日期變更
             dateInput.addEventListener('change', (e) => {
                 Store.state.date = e.target.value;
                 renderExpenses();
+            });
+
+            monthInput.addEventListener('change', (e) => {
+                Store.state.analysisMonth = e.target.value;
+                renderAnalysis();
             });
             
             try {
                 renderExpenses();
                 if (navigator.onLine) fetchExpenses();
-            } catch (e) {
-                console.error(e);
-            }
+            } catch (e) { console.error(e); }
         });
+
+        // Tab 切換
+        function switchTab(tabId) {
+            document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(`view-${tabId}`).classList.add('active');
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            
+            document.getElementById('header-title').innerText = tabId === 'analysis' ? '每月分析' : '噗噗記帳本';
+
+            if (tabId === 'analysis') renderAnalysis();
+        }
+
+        // 收支模式切換
+        function setRecordType(type) {
+            Store.state.recordType = type;
+            const isInc = type === 'income';
+            
+            // 更新按鈕樣式
+            document.getElementById('btn-type-exp').classList.toggle('active', !isInc);
+            document.getElementById('btn-type-inc').classList.toggle('active', isInc);
+            
+            // 切換分類 Grid
+            document.getElementById('cat-expense-grid').style.display = isInc ? 'none' : 'grid';
+            document.getElementById('cat-income-grid').style.display = isInc ? 'grid' : 'none';
+            document.getElementById('cat-title').innerText = isInc ? '選擇收入來源' : '選擇支出分類';
+
+            // 預設選取第一個分類
+            Store.state.category = isInc ? '薪水' : '交通';
+            const grids = document.querySelectorAll(isInc ? '#cat-income-grid .bento-box' : '#cat-expense-grid .bento-box');
+            grids.forEach(box => box.classList.remove('active'));
+            if(grids.length > 0) grids[0].classList.add('active');
+
+            // 變更輸入框樣式
+            const wrapper = document.getElementById('input-wrapper');
+            const sym = document.getElementById('curr-symbol');
+            const btn = document.getElementById('submit-btn');
+            const input = document.getElementById('item-price');
+            
+            if (isInc) {
+                wrapper.style.background = 'rgba(76, 175, 80, 0.1)';
+                sym.style.color = 'var(--income-color)';
+                sym.innerText = '+';
+                input.style.color = 'var(--income-color)';
+                btn.style.background = 'var(--income-color)';
+                btn.style.boxShadow = '0 4px 12px rgba(76, 175, 80, 0.3)';
+            } else {
+                wrapper.style.background = 'rgba(224, 215, 207, 0.3)';
+                sym.style.color = 'var(--primary)';
+                sym.innerText = '$';
+                input.style.color = 'var(--primary)';
+                btn.style.background = 'var(--primary)';
+                btn.style.boxShadow = 'var(--shadow-btn)';
+            }
+        }
 
         function selectPerson(person, el) {
             Store.state.person = person;
@@ -330,13 +468,14 @@
 
         function selectCategory(cat, el) {
             Store.state.category = cat;
-            document.querySelectorAll('.bento-box').forEach(box => box.classList.remove('active'));
+            const parent = el.parentElement;
+            parent.querySelectorAll('.bento-box').forEach(box => box.classList.remove('active'));
             el.classList.add('active');
         }
 
         function editBudget() {
             const current = Store.state.budget;
-            const input = prompt("請輸入您的每月預算金額：", current);
+            const input = prompt("請輸入您的每月花費預算：", current);
             if (input !== null) {
                 const num = parseInt(input.replace(/[^\d]/g, ''), 10);
                 if (!isNaN(num) && num > 0) {
@@ -355,65 +494,6 @@
             fetchExpenses();
         }
 
-        // Modal 統計現在也依照「當月」去計算
-        function openStatsModal() {
-            const targetDateObj = new Date(Store.state.date);
-            const targetY = targetDateObj.getFullYear();
-            const targetM = targetDateObj.getMonth() + 1;
-
-            const container = document.getElementById('stats-content');
-            let stats = { '交通': 0, '食物': 0, '購物': 0, '其他': 0 };
-            let totalTWD = 0;
-            
-            Store.state.expenses.forEach(item => {
-                const sheetDate = String(item.date).trim();
-                let isSameMonth = false;
-                if (sheetDate.includes('-') || sheetDate.includes('/')) {
-                    const itemDateObj = new Date(sheetDate);
-                    if(!isNaN(itemDateObj.getTime())) {
-                        isSameMonth = (itemDateObj.getFullYear() === targetY && itemDateObj.getMonth() + 1 === targetM);
-                    }
-                } else if (sheetDate === Store.state.date) {
-                    isSameMonth = true;
-                }
-
-                if (isSameMonth) {
-                    let price = Math.round(parseFloat(item.price) || 0);
-                    stats[item.cat] = (stats[item.cat] || 0) + price;
-                    totalTWD += price;
-                }
-            });
-
-            let html = '';
-            const cats = ['交通', '食物', '購物', '其他'];
-            cats.forEach(cat => {
-                let valTWD = stats[cat];
-                let icon = EMOJI_MAP[cat] || 'ph-ticket';
-                let percent = totalTWD === 0 ? 0 : Math.round((valTWD / totalTWD) * 100);
-                
-                html += `
-                <div class="stat-item">
-                    <div class="stat-left">
-                        <div class="stat-icon"><i class="ph-fill ${icon}"></i></div>
-                        <div class="stat-info">
-                            <h4>${cat}</h4>
-                            <span class="stat-percent">${percent}% 佔比</span>
-                        </div>
-                    </div>
-                    <div class="stat-right">
-                        <span class="s-twd">$${valTWD.toLocaleString()}</span>
-                    </div>
-                </div>`;
-            });
-            
-            container.innerHTML = html;
-            document.getElementById('stats-modal').classList.add('active');
-        }
-
-        function closeStatsModal() {
-            document.getElementById('stats-modal').classList.remove('active');
-        }
-
         function showToast(msg, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
@@ -425,87 +505,92 @@
             }, 2500);
         }
 
+        // 解析資料：判斷是不是同一個月/同一天，以及分離名字標籤
+        function parseItem(item, targetDateStr, targetMonthStr) {
+            const sheetDate = String(item.date).trim();
+            const rawPrice = parseFloat(item.price) || 0;
+            const isIncome = rawPrice < 0; // 我們約定負數為收入
+            const absPrice = Math.round(Math.abs(rawPrice));
+            
+            let isSameMonth = false;
+            let isSameDay = false;
+            
+            const tdObj = new Date(targetDateStr);
+            const tmObj = new Date(targetMonthStr + '-01'); // Ensure valid date for month
+            
+            if (sheetDate.includes('-') || sheetDate.includes('/')) {
+                const d = new Date(sheetDate);
+                if(!isNaN(d.getTime())) {
+                    isSameMonth = (d.getFullYear() === tmObj.getFullYear() && d.getMonth() === tmObj.getMonth());
+                    isSameDay = (d.getFullYear() === tdObj.getFullYear() && d.getMonth() === tdObj.getMonth() && d.getDate() === tdObj.getDate());
+                }
+            } else if (sheetDate === targetDateStr) {
+                isSameDay = true;
+                isSameMonth = true;
+            }
+
+            const safeName = String(item.name).replace(/[<>]/g, "");
+            let person = '噗噗'; // 預設共用
+            let displayName = safeName;
+            const tagMatch = safeName.match(/^【(.*?)】(.*)/);
+            if (tagMatch) {
+                person = tagMatch[1];
+                displayName = tagMatch[2].trim();
+            }
+
+            return { ...item, isIncome, absPrice, isSameMonth, isSameDay, person, displayName };
+        }
+
+        // 渲染記帳首頁
         function renderExpenses() {
             const listEl = document.getElementById('expense-list');
             listEl.innerHTML = '';
             
-            // 解析目前選取的日期
-            const targetDateObj = new Date(Store.state.date);
-            const targetY = targetDateObj.getFullYear();
-            const targetM = targetDateObj.getMonth() + 1;
-            const targetD = targetDateObj.getDate();
-            const targetShortDate = `${targetM}/${targetD}`; 
-
-            let monthlyTotal = 0;
+            let monthlyExpenseTotal = 0;
             const selectedDayItems = [];
 
-            // 同時計算「當天花費紀錄」與「當月總計金額」
-            Store.state.expenses.forEach(item => {
-                const sheetDate = String(item.date).trim();
-                let isSameMonth = false;
-                let isSameDay = false;
+            Store.state.expenses.forEach(rawItem => {
+                const item = parseItem(rawItem, Store.state.date, Store.state.date.substring(0,7));
                 
-                if (sheetDate.includes('T') || sheetDate.includes('-') || sheetDate.includes('/')) {
-                    const d = new Date(sheetDate);
-                    if(!isNaN(d.getTime())) {
-                        isSameMonth = (d.getFullYear() === targetY && d.getMonth() + 1 === targetM);
-                        isSameDay = (isSameMonth && d.getDate() === targetD);
-                    } else if (sheetDate === targetShortDate || sheetDate.includes(targetShortDate)) {
-                        isSameDay = true;
-                        isSameMonth = true;
-                    }
-                } else if (sheetDate === Store.state.date) {
-                    isSameDay = true;
-                    isSameMonth = true;
-                }
-
-                const price = Math.round(parseFloat(item.price) || 0);
-
-                if (isSameMonth) monthlyTotal += price;
-                if (isSameDay) selectedDayItems.push(item);
+                // 記帳首頁的預算只看「支出」
+                if (item.isSameMonth && !item.isIncome) monthlyExpenseTotal += item.absPrice;
+                if (item.isSameDay) selectedDayItems.push(item);
             });
 
             if (selectedDayItems.length === 0) {
                 listEl.innerHTML = `<div style="text-align:center; padding: 40px 20px; color: var(--text-muted); font-weight:600;">本日尚無紀錄</div>`;
             } else {
                 selectedDayItems.forEach(item => {
-                    const price = Math.round(parseFloat(item.price));
-                    const safeName = String(item.name).replace(/[<>]/g, "");
                     const icon = EMOJI_MAP[item.cat] || 'ph-ticket';
-                    
-                    let personTagHtml = '';
-                    let displayName = safeName;
-                    const tagMatch = safeName.match(/^【(.*?)】(.*)/);
-                    if (tagMatch) {
-                        personTagHtml = `<span class="h-tag">${tagMatch[1]}</span>`;
-                        displayName = tagMatch[2].trim();
-                    }
+                    const incClass = item.isIncome ? 'inc' : '';
+                    const sign = item.isIncome ? '+' : '';
+                    const personTag = item.person !== '噗噗' ? `<span class="h-tag">${item.person}</span>` : '';
 
                     listEl.innerHTML += `
                     <div class="h-item">
                         <div class="h-left">
-                            <div class="h-icon"><i class="ph-fill ${icon}"></i></div>
+                            <div class="h-icon ${incClass}"><i class="ph-fill ${icon}"></i></div>
                             <div class="h-info">
-                                <h4>${displayName} ${personTagHtml}</h4>
+                                <h4>${item.displayName} ${personTag}</h4>
                                 <span class="h-cat">${item.cat}</span>
                             </div>
                         </div>
                         <div class="h-right">
-                            <div class="h-price">$${price}</div>
+                            <div class="h-price ${incClass}">${sign}$${item.absPrice}</div>
                             <button class="h-del" onclick="deleteExpense('${item.id}')"><i class="ph-bold ph-trash"></i></button>
                         </div>
                     </div>`;
                 });
             }
             
-            // 更新上方總金額卡片與進度條
-            document.getElementById('total-primary').innerText = `NT$ ${monthlyTotal.toLocaleString()}`;
+            // 更新預算與總額
+            document.getElementById('total-primary').innerText = `NT$ ${monthlyExpenseTotal.toLocaleString()}`;
             
             let currentBudget = Store.state.budget;
-            document.getElementById('budget-total-label').innerText = `/ ${(currentBudget/1000).toFixed(1).replace('.0','')}k 每月預算`;
+            document.getElementById('budget-total-label').innerText = `/ ${(currentBudget/1000).toFixed(1).replace('.0','')}k 預算`;
 
-            let spentPercent = (monthlyTotal / currentBudget) * 100;
-            let remaining = currentBudget - monthlyTotal;
+            let spentPercent = (monthlyExpenseTotal / currentBudget) * 100;
+            let remaining = currentBudget - monthlyExpenseTotal;
             const fillEl = document.getElementById('budget-fill');
             const remLabel = document.getElementById('budget-rem-label');
 
@@ -517,9 +602,84 @@
                 fillEl.style.background = spentPercent > 85 ? '#e0d7cf' : 'var(--bg-color)'; 
             } else {
                 remLabel.innerText = `超支 NT$ ${Math.abs(remaining).toLocaleString()}`;
-                remLabel.style.color = '#ffb3b3'; // 柔和的紅色警示
+                remLabel.style.color = '#ffb3b3'; 
                 fillEl.style.background = '#ffb3b3';
             }
+        }
+
+        // 渲染分析頁面
+        function renderAnalysis() {
+            let totalInc = 0;
+            let totalExp = 0;
+            let catStats = {};
+            let memberStats = { '噗噗': 0, '廖噗': 0, '陳噗': 0 };
+
+            Store.state.expenses.forEach(rawItem => {
+                const item = parseItem(rawItem, '', Store.state.analysisMonth);
+                
+                if (item.isSameMonth) {
+                    if (item.isIncome) {
+                        totalInc += item.absPrice;
+                    } else {
+                        totalExp += item.absPrice;
+                        catStats[item.cat] = (catStats[item.cat] || 0) + item.absPrice;
+                        if(memberStats[item.person] !== undefined) {
+                            memberStats[item.person] += item.absPrice;
+                        } else {
+                            memberStats['噗噗'] += item.absPrice; // 防呆
+                        }
+                    }
+                }
+            });
+
+            const net = totalInc - totalExp;
+            document.getElementById('dash-inc').innerText = `$${totalInc.toLocaleString()}`;
+            document.getElementById('dash-exp').innerText = `$${totalExp.toLocaleString()}`;
+            
+            const netEl = document.getElementById('dash-net');
+            netEl.innerText = `${net >= 0 ? '+' : ''}$${net.toLocaleString()}`;
+            netEl.style.color = net > 0 ? 'var(--income-color)' : (net < 0 ? 'var(--primary)' : 'var(--text-main)');
+
+            // 渲染成員圖表
+            let memHtml = '';
+            const mColors = { '噗噗': 'p1', '廖噗': 'p2', '陳噗': 'p3' };
+            const memIcon = { '噗噗': '👥', '廖噗': '👩🏻', '陳噗': '👦🏻' };
+            for (let m in memberStats) {
+                let val = memberStats[m];
+                let pct = totalExp === 0 ? 0 : Math.round((val / totalExp) * 100);
+                memHtml += `
+                <div class="chart-row">
+                    <div class="cr-top">
+                        <div class="cr-name">${memIcon[m]} ${m}</div>
+                        <div class="cr-val">$${val.toLocaleString()} (${pct}%)</div>
+                    </div>
+                    <div class="cr-track"><div class="cr-fill ${mColors[m]}" style="width: ${pct}%"></div></div>
+                </div>`;
+            }
+            document.getElementById('member-chart-container').innerHTML = memHtml;
+
+            // 渲染分類圖表 (排序)
+            let catHtml = '';
+            let sortedCats = Object.keys(catStats).sort((a,b) => catStats[b] - catStats[a]);
+            
+            if(sortedCats.length === 0) {
+                catHtml = '<div style="text-align:center; color:var(--text-muted); font-size:13px;">本月尚無支出資料</div>';
+            } else {
+                sortedCats.forEach(cat => {
+                    let val = catStats[cat];
+                    let pct = totalExp === 0 ? 0 : Math.round((val / totalExp) * 100);
+                    let icon = EMOJI_MAP[cat] || 'ph-ticket';
+                    catHtml += `
+                    <div class="chart-row">
+                        <div class="cr-top">
+                            <div class="cr-name"><i class="ph-fill ${icon}"></i> ${cat}</div>
+                            <div class="cr-val">$${val.toLocaleString()}</div>
+                        </div>
+                        <div class="cr-track"><div class="cr-fill p1" style="width: ${pct}%; opacity: ${Math.max(0.4, pct/100 + 0.2)}"></div></div>
+                    </div>`;
+                });
+            }
+            document.getElementById('cat-chart-container').innerHTML = catHtml;
         }
 
         async function fetchExpenses() {
@@ -529,6 +689,7 @@
                 if (Array.isArray(freshData)) {
                     Store.updateExpenses(freshData);
                     renderExpenses();
+                    if(document.getElementById('view-analysis').classList.contains('active')) renderAnalysis();
                 }
             } catch (err) { console.error("Fetch Data Error:", err); }
         }
@@ -541,17 +702,21 @@
             if (isNaN(inputPrice) || inputPrice <= 0) return showToast('請輸入有效金額', 'error'); 
             
             let baseName = nameEl.value.trim() || Store.state.category;
-            let finalName = Store.state.person ? `【${Store.state.person}】${baseName}` : baseName;
+            // 只有當前是「支出」且有選擇非共用的成員時，才加上標籤。收入預設算整體的。
+            let isInc = Store.state.recordType === 'income';
+            let finalName = (!isInc && Store.state.person) ? `【${Store.state.person}】${baseName}` : baseName;
+            
+            // 核心邏輯：收入傳遞負數金額儲存，維持 Google Sheet 相容性
+            let finalPrice = isInc ? -Math.abs(Math.round(inputPrice)) : Math.abs(Math.round(inputPrice));
             
             const newId = Date.now().toString();
-            // 存入時格式統一為 YYYY-MM-DD
-            const newExpenseObj = { id: newId, date: Store.state.date, cat: Store.state.category, name: finalName, price: Math.round(inputPrice) };
+            const newExpenseObj = { id: newId, date: Store.state.date, cat: Store.state.category, name: finalName, price: finalPrice };
             
             Store.updateExpenses([...Store.state.expenses, newExpenseObj]);
             renderExpenses();
             
             nameEl.value = ''; priceEl.value = ''; priceEl.blur(); 
-            showToast(`已新增一筆花費`);
+            showToast(`已新增一筆${isInc ? '收入' : '花費'}`);
 
             try {
                 const params = new URLSearchParams({ action: 'add', ...newExpenseObj });
