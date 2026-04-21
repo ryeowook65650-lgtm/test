@@ -28,7 +28,7 @@
             --text-main: #1C1C1E;
             --text-muted: #8E8E93;
             --border-color: rgba(224, 215, 207, 0.6); 
-            --income-color: #4CAF50; /* 柔和的綠色用於收入 */
+            --income-color: #4CAF50; 
             
             --radius-lg: 24px;
             --radius-md: 16px;
@@ -44,7 +44,7 @@
 
         body { 
             margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-main);
-            padding-bottom: calc(90px + env(safe-area-inset-bottom)); /* 預留底部導覽列空間 */
+            padding-bottom: calc(90px + env(safe-area-inset-bottom)); 
             overscroll-behavior-y: none;
         }
 
@@ -101,16 +101,21 @@
         }
         .balance-card::after { content: ''; position: absolute; right: -20px; top: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; pointer-events: none;}
         
-        .b-title { font-size: 13px; font-weight: 600; opacity: 0.9; margin-bottom: 8px; }
+        .b-title { font-size: 13px; font-weight: 600; opacity: 0.9; margin-bottom: 8px; display: flex; justify-content: space-between; position: relative; z-index: 2; }
         .b-amount { font-size: 40px; font-weight: 800; margin: 0 0 4px; letter-spacing: -1px; position: relative; z-index: 2;}
-        .b-sub { font-size: 15px; opacity: 0.9; font-weight: 600; position: relative; z-index: 2;}
 
-        .budget-wrapper { margin-top: 20px; position: relative; z-index: 2; }
+        .budget-wrapper { margin-top: 16px; position: relative; z-index: 2; }
         .budget-info { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; margin-bottom: 8px; opacity: 0.95; }
         .budget-tot { opacity: 0.8; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 8px; cursor: pointer; backdrop-filter: blur(4px); transition: 0.2s;}
         .budget-tot:active { background: rgba(255,255,255,0.3); transform: scale(0.95); }
         .budget-track { height: 6px; background: rgba(255,255,255,0.2); border-radius: 99px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);}
         .budget-fill { height: 100%; width: 0%; background: var(--bg-color); border-radius: 99px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease; }
+
+        /* 個人花費小計 */
+        .personal-totals { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2); position: relative; z-index: 2; }
+        .p-tot { display: flex; flex-direction: column; gap: 4px; }
+        .p-tot span { font-size: 12px; opacity: 0.9; font-weight: 600; }
+        .p-tot strong { font-size: 18px; font-weight: 800; }
 
         .date-picker-wrapper { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow-card); display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border-color); }
         .date-picker-wrapper input { font-size: 16px; font-weight: 600; color: var(--text-main); width: 100%; background: transparent; }
@@ -210,20 +215,33 @@
         <section id="view-accounting" class="view-container active">
             
             <div class="balance-card">
-                <div class="b-title">當月累計支出 (不含收入)</div>
-                <h2 class="b-amount" id="total-primary">NT$ 0</h2>
-                <div class="b-sub">以選取日期的月份計算</div>
+                <div class="b-title">
+                    <span>當月共用花費 (噗噗)</span>
+                    <span style="font-weight: 400; opacity: 0.8;">依選取月份計算</span>
+                </div>
+                <h2 class="b-amount" id="total-shared">NT$ 0</h2>
 
                 <div class="budget-wrapper">
                     <div class="budget-info">
                         <span id="budget-rem-label">剩餘 NT$ 15,000</span>
                         <span class="budget-tot" onclick="editBudget()">
-                            <span id="budget-total-label">/ 15k 每月預算</span>
+                            <span id="budget-total-label">/ 15k 預算</span>
                             <i class="ph-bold ph-pencil-simple"></i>
                         </span>
                     </div>
                     <div class="budget-track">
                         <div class="budget-fill" id="budget-fill"></div>
+                    </div>
+                </div>
+
+                <div class="personal-totals">
+                    <div class="p-tot">
+                        <span>👩🏻 廖噗</span>
+                        <strong id="total-p2">$0</strong>
+                    </div>
+                    <div class="p-tot">
+                        <span>👦🏻 陳噗</span>
+                        <strong id="total-p3">$0</strong>
                     </div>
                 </div>
             </div>
@@ -301,7 +319,7 @@
 
             <div class="dash-summary">
                 <div class="dash-card full">
-                    <span class="dc-title">當月淨結餘 (收入 - 支出)</span>
+                    <span class="dc-title">當月淨結餘 (總收入 - 總支出)</span>
                     <div class="dc-val net" id="dash-net">$0</div>
                 </div>
                 <div class="dash-card">
@@ -314,11 +332,11 @@
                 </div>
             </div>
 
-            <h3 class="section-title">成員花費比例 (僅計算支出)</h3>
+            <h3 class="section-title">成員花費比例 (含個人與共用支出)</h3>
             <div class="chart-section" id="member-chart-container">
                 </div>
 
-            <h3 class="section-title">支出分類排行</h3>
+            <h3 class="section-title">整體支出分類排行</h3>
             <div class="chart-section" id="cat-chart-container">
                 </div>
         </section>
@@ -353,11 +371,11 @@
             state: {
                 expenses: getSafeStorage('cached_expenses', []),
                 budget: parseInt(localStorage.getItem('monthly_budget')) || 15000,
-                date: '',           // YYYY-MM-DD
-                analysisMonth: '',  // YYYY-MM
+                date: '',           
+                analysisMonth: '',  
                 person: '',     
                 category: '交通',
-                recordType: 'expense' // 'expense' or 'income'
+                recordType: 'expense' 
             },
             updateExpenses(newData) {
                 this.state.expenses = newData;
@@ -371,7 +389,6 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            // 初始化日期
             const dateInput = document.getElementById('expense-date');
             const monthInput = document.getElementById('analysis-month');
             const today = new Date();
@@ -404,7 +421,6 @@
             } catch (e) { console.error(e); }
         });
 
-        // Tab 切換
         function switchTab(tabId) {
             document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -417,27 +433,22 @@
             if (tabId === 'analysis') renderAnalysis();
         }
 
-        // 收支模式切換
         function setRecordType(type) {
             Store.state.recordType = type;
             const isInc = type === 'income';
             
-            // 更新按鈕樣式
             document.getElementById('btn-type-exp').classList.toggle('active', !isInc);
             document.getElementById('btn-type-inc').classList.toggle('active', isInc);
             
-            // 切換分類 Grid
             document.getElementById('cat-expense-grid').style.display = isInc ? 'none' : 'grid';
             document.getElementById('cat-income-grid').style.display = isInc ? 'grid' : 'none';
             document.getElementById('cat-title').innerText = isInc ? '選擇收入來源' : '選擇支出分類';
 
-            // 預設選取第一個分類
             Store.state.category = isInc ? '薪水' : '交通';
             const grids = document.querySelectorAll(isInc ? '#cat-income-grid .bento-box' : '#cat-expense-grid .bento-box');
             grids.forEach(box => box.classList.remove('active'));
             if(grids.length > 0) grids[0].classList.add('active');
 
-            // 變更輸入框樣式
             const wrapper = document.getElementById('input-wrapper');
             const sym = document.getElementById('curr-symbol');
             const btn = document.getElementById('submit-btn');
@@ -475,7 +486,7 @@
 
         function editBudget() {
             const current = Store.state.budget;
-            const input = prompt("請輸入您的每月花費預算：", current);
+            const input = prompt("請輸入共用花費的每月預算：", current);
             if (input !== null) {
                 const num = parseInt(input.replace(/[^\d]/g, ''), 10);
                 if (!isNaN(num) && num > 0) {
@@ -505,18 +516,17 @@
             }, 2500);
         }
 
-        // 解析資料：判斷是不是同一個月/同一天，以及分離名字標籤
         function parseItem(item, targetDateStr, targetMonthStr) {
             const sheetDate = String(item.date).trim();
             const rawPrice = parseFloat(item.price) || 0;
-            const isIncome = rawPrice < 0; // 我們約定負數為收入
+            const isIncome = rawPrice < 0; 
             const absPrice = Math.round(Math.abs(rawPrice));
             
             let isSameMonth = false;
             let isSameDay = false;
             
             const tdObj = new Date(targetDateStr);
-            const tmObj = new Date(targetMonthStr + '-01'); // Ensure valid date for month
+            const tmObj = new Date(targetMonthStr + '-01'); 
             
             if (sheetDate.includes('-') || sheetDate.includes('/')) {
                 const d = new Date(sheetDate);
@@ -530,7 +540,7 @@
             }
 
             const safeName = String(item.name).replace(/[<>]/g, "");
-            let person = '噗噗'; // 預設共用
+            let person = '噗噗'; 
             let displayName = safeName;
             const tagMatch = safeName.match(/^【(.*?)】(.*)/);
             if (tagMatch) {
@@ -541,19 +551,23 @@
             return { ...item, isIncome, absPrice, isSameMonth, isSameDay, person, displayName };
         }
 
-        // 渲染記帳首頁
         function renderExpenses() {
             const listEl = document.getElementById('expense-list');
             listEl.innerHTML = '';
             
-            let monthlyExpenseTotal = 0;
+            let monthlyShared = 0;
+            let monthlyP2 = 0;
+            let monthlyP3 = 0;
             const selectedDayItems = [];
 
             Store.state.expenses.forEach(rawItem => {
                 const item = parseItem(rawItem, Store.state.date, Store.state.date.substring(0,7));
                 
-                // 記帳首頁的預算只看「支出」
-                if (item.isSameMonth && !item.isIncome) monthlyExpenseTotal += item.absPrice;
+                if (item.isSameMonth && !item.isIncome) {
+                    if (item.person === '噗噗') monthlyShared += item.absPrice;
+                    else if (item.person === '廖噗') monthlyP2 += item.absPrice;
+                    else if (item.person === '陳噗') monthlyP3 += item.absPrice;
+                }
                 if (item.isSameDay) selectedDayItems.push(item);
             });
 
@@ -583,14 +597,16 @@
                 });
             }
             
-            // 更新預算與總額
-            document.getElementById('total-primary').innerText = `NT$ ${monthlyExpenseTotal.toLocaleString()}`;
+            // 更新三者的當月累計
+            document.getElementById('total-shared').innerText = `NT$ ${monthlyShared.toLocaleString()}`;
+            document.getElementById('total-p2').innerText = `$${monthlyP2.toLocaleString()}`;
+            document.getElementById('total-p3').innerText = `$${monthlyP3.toLocaleString()}`;
             
             let currentBudget = Store.state.budget;
             document.getElementById('budget-total-label').innerText = `/ ${(currentBudget/1000).toFixed(1).replace('.0','')}k 預算`;
 
-            let spentPercent = (monthlyExpenseTotal / currentBudget) * 100;
-            let remaining = currentBudget - monthlyExpenseTotal;
+            let spentPercent = (monthlyShared / currentBudget) * 100;
+            let remaining = currentBudget - monthlyShared;
             const fillEl = document.getElementById('budget-fill');
             const remLabel = document.getElementById('budget-rem-label');
 
@@ -607,7 +623,6 @@
             }
         }
 
-        // 渲染分析頁面
         function renderAnalysis() {
             let totalInc = 0;
             let totalExp = 0;
@@ -626,7 +641,7 @@
                         if(memberStats[item.person] !== undefined) {
                             memberStats[item.person] += item.absPrice;
                         } else {
-                            memberStats['噗噗'] += item.absPrice; // 防呆
+                            memberStats['噗噗'] += item.absPrice; 
                         }
                     }
                 }
@@ -640,7 +655,6 @@
             netEl.innerText = `${net >= 0 ? '+' : ''}$${net.toLocaleString()}`;
             netEl.style.color = net > 0 ? 'var(--income-color)' : (net < 0 ? 'var(--primary)' : 'var(--text-main)');
 
-            // 渲染成員圖表
             let memHtml = '';
             const mColors = { '噗噗': 'p1', '廖噗': 'p2', '陳噗': 'p3' };
             const memIcon = { '噗噗': '👥', '廖噗': '👩🏻', '陳噗': '👦🏻' };
@@ -658,7 +672,6 @@
             }
             document.getElementById('member-chart-container').innerHTML = memHtml;
 
-            // 渲染分類圖表 (排序)
             let catHtml = '';
             let sortedCats = Object.keys(catStats).sort((a,b) => catStats[b] - catStats[a]);
             
@@ -702,11 +715,9 @@
             if (isNaN(inputPrice) || inputPrice <= 0) return showToast('請輸入有效金額', 'error'); 
             
             let baseName = nameEl.value.trim() || Store.state.category;
-            // 只有當前是「支出」且有選擇非共用的成員時，才加上標籤。收入預設算整體的。
             let isInc = Store.state.recordType === 'income';
             let finalName = (!isInc && Store.state.person) ? `【${Store.state.person}】${baseName}` : baseName;
             
-            // 核心邏輯：收入傳遞負數金額儲存，維持 Google Sheet 相容性
             let finalPrice = isInc ? -Math.abs(Math.round(inputPrice)) : Math.abs(Math.round(inputPrice));
             
             const newId = Date.now().toString();
