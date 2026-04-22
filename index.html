@@ -111,11 +111,6 @@
         .budget-track { height: 6px; background: rgba(255,255,255,0.2); border-radius: 99px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);}
         .budget-fill { height: 100%; width: 0%; background: var(--bg-color); border-radius: 99px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease; }
 
-        .personal-totals { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.15); position: relative; z-index: 2; }
-        .p-tot { display: flex; flex-direction: column; gap: 4px; }
-        .p-tot span { font-size: 11px; opacity: 0.85; font-weight: 600; }
-        .p-tot strong { font-size: 18px; font-weight: 800; }
-
         .date-picker-wrapper { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow-card); display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border-color); }
         .date-picker-wrapper input { font-size: 16px; font-weight: 600; color: var(--text-main); width: 100%; background: transparent; }
 
@@ -216,6 +211,7 @@
 
     <main>
         <section id="view-accounting" class="view-container active">
+            
             <div class="balance-card">
                 <div class="b-title">
                     <span>當月共用花費 (噗噗)</span>
@@ -232,16 +228,6 @@
                     </div>
                     <div class="budget-track">
                         <div class="budget-fill" id="budget-fill"></div>
-                    </div>
-                </div>
-                <div class="personal-totals">
-                    <div class="p-tot">
-                        <span>🦭 廖噗 (含共用均分)</span>
-                        <strong id="total-p2">$0</strong>
-                    </div>
-                    <div class="p-tot">
-                        <span>🦦 陳噗 (含共用均分)</span>
-                        <strong id="total-p3">$0</strong>
                     </div>
                 </div>
             </div>
@@ -266,6 +252,7 @@
                 <div class="segment-wrapper" style="margin-bottom: 0; flex: 1;">
                     <button class="seg-btn active" id="payer-liao" onclick="selectPayer('廖噗', this)">🦭 廖噗</button>
                     <button class="seg-btn" id="payer-chen" onclick="selectPayer('陳噗', this)">🦦 陳噗</button>
+                    <button class="seg-btn" id="payer-aa" onclick="selectPayer('各自付', this)">✂️ 各自付</button>
                 </div>
             </div>
 
@@ -349,6 +336,7 @@
     <div id="toast-container" class="toast-container"></div>
 
     <script>
+        // ！！請替換成您自己的 Google Apps Script URL！！
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyU6NkYTvOYPN3-tzuUxq02kjB-vbUoPScoDpstNM1dmvVVobyqDMfZFCw0ftDzrAbtxQ/exec';
 
         function getSafeStorage(key, defaultVal) {
@@ -460,6 +448,18 @@
             Store.state.person = person;
             document.querySelectorAll('#person-segment .seg-btn').forEach(btn => btn.classList.remove('active'));
             el.classList.add('active');
+
+            // 如果不是選共用，就隱藏「各自付」的按鈕，並自動重置代墊人為自己
+            const payerAA = document.getElementById('payer-aa');
+            if (person === '噗噗') {
+                payerAA.style.display = 'block';
+            } else {
+                payerAA.style.display = 'none';
+                if (Store.state.payer === '各自付') {
+                    const selfBtn = person === '廖噗' ? document.getElementById('payer-liao') : document.getElementById('payer-chen');
+                    selectPayer(person, selfBtn);
+                }
+            }
         }
 
         function selectPayer(payer, el) {
@@ -533,9 +533,7 @@
             listEl.innerHTML = '';
             
             let monthlyShared = 0;
-            let monthlyP2 = 0;
-            let monthlyP3 = 0;
-            let monthlyTotal = 0; // 當月總花費（算進度條用的）
+            let monthlyTotal = 0; 
             const selectedDayItems = [];
             
             Store.state.expenses.forEach(rawItem => {
@@ -543,8 +541,6 @@
                 if (item.isSameMonth && !item.isIncome && item.cat !== '結清') {
                     monthlyTotal += item.absPrice;
                     if (item.person === '噗噗') monthlyShared += item.absPrice;
-                    else if (item.person === '廖噗') monthlyP2 += item.absPrice;
-                    else if (item.person === '陳噗') monthlyP3 += item.absPrice;
                 }
                 if (item.isSameDay) selectedDayItems.push(item);
             });
@@ -559,25 +555,24 @@
                     let personTagHtml = '';
                     if (item.cat === '結清') personTagHtml = `<span class="h-tag settled">還款紀錄</span>`;
                     else if (!item.isIncome) {
-                        if (item.person === '噗噗') personTagHtml = `<span class="h-tag shared">共用 (${item.payer}付)</span>`;
-                        else if (item.person !== item.payer) personTagHtml = `<span class="h-tag alert">${item.person} (${item.payer}付)</span>`;
-                        else personTagHtml = `<span class="h-tag">${item.person}</span>`;
+                        if (item.person === '噗噗') {
+                            let payerText = item.payer === '各自付' ? '各自付' : `${item.payer}付`;
+                            personTagHtml = `<span class="h-tag shared">共用 (${payerText})</span>`;
+                        } else if (item.person !== item.payer) {
+                            personTagHtml = `<span class="h-tag alert">${item.person} (${item.payer}付)</span>`;
+                        } else {
+                            personTagHtml = `<span class="h-tag">${item.person}</span>`;
+                        }
                     } else personTagHtml = `<span class="h-tag">${item.person}</span>`;
                     listEl.innerHTML += `<div class="h-item"><div class="h-left"><div class="h-icon ${incClass}"><i class="ph-fill ${icon}"></i></div><div class="h-info"><h4>${item.displayName} ${personTagHtml}</h4><span class="h-cat">${item.cat}</span></div></div><div class="h-right"><div class="h-price ${incClass}">${sign}$${item.absPrice}</div><button class="h-del" onclick="deleteExpense('${item.id}')"><i class="ph-bold ph-trash"></i></button></div></div>`;
                 });
             }
 
-            const actualP2 = monthlyP2 + (monthlyShared / 2);
-            const actualP3 = monthlyP3 + (monthlyShared / 2);
-
             document.getElementById('total-shared').innerText = `NT$ ${monthlyShared.toLocaleString()}`;
-            document.getElementById('total-p2').innerText = `$${Math.round(actualP2).toLocaleString()}`;
-            document.getElementById('total-p3').innerText = `$${Math.round(actualP3).toLocaleString()}`;
             
             let currentBudget = Store.state.budget;
             document.getElementById('budget-total-label').innerText = `/ ${(currentBudget/1000).toFixed(1).replace('.0','')}k 總預算`;
             
-            // 進度條改為使用 monthlyTotal 計算
             let spentPercent = (monthlyTotal / currentBudget) * 100;
             let remaining = currentBudget - monthlyTotal;
             const fillEl = document.getElementById('budget-fill'), remLabel = document.getElementById('budget-rem-label');
@@ -616,7 +611,7 @@
                 sortedCats.forEach(cat => {
                     let val = catStats[cat], pct = totalExp === 0 ? 0 : Math.round((val / totalExp) * 100);
                     let icon = EMOJI_MAP[cat] || 'ph-ticket';
-                    catHtml += `<div class="chart-row"><div class="cr-top"><div class="cr-name"><i class="ph-fill ${icon}"></i> ${cat}</div><div class="cr-val">$${val.toLocaleString()}</div></div><div class="cr-track"><div class="cr-fill" style="width: ${pct}%; opacity: ${Math.max(0.4, pct/100 + 0.2)}"></div></div></div>`;
+                    catHtml += `<div class="chart-row"><div class="cr-top"><div class="cr-name"><i class="ph-fill ${icon}"></i> ${cat}</div><div class="cr-val">$${val.toLocaleString()}</div></div><div class="cr-track"><div class="cr-fill p1" style="width: ${pct}%; opacity: ${Math.max(0.4, pct/100 + 0.2)}"></div></div></div>`;
                 });
             }
             document.getElementById('cat-chart-container').innerHTML = catHtml;
@@ -633,7 +628,11 @@
                         if (item.payer === '陳噗') settledByChen += item.absPrice;
                         historyList.push(item);
                     } else {
-                        if (item.person === '噗噗') { if (item.payer === '廖噗') sharedPaidByLiao += item.absPrice; if (item.payer === '陳噗') sharedPaidByChen += item.absPrice; }
+                        if (item.person === '噗噗') { 
+                            if (item.payer === '廖噗') sharedPaidByLiao += item.absPrice; 
+                            if (item.payer === '陳噗') sharedPaidByChen += item.absPrice; 
+                            // 各自付不增加雙方代墊總額
+                        }
                         else if (item.person === '廖噗' && item.payer === '陳噗') chenPaidForLiao += item.absPrice;
                         else if (item.person === '陳噗' && item.payer === '廖噗') liaoPaidForChen += item.absPrice;
                     }
