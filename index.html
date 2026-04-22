@@ -20,15 +20,15 @@
            1. 現代原生 App 變數設定 (極簡莫蘭迪/低飽和色票)
            ========================================= */
         :root {
-            --bg-color: #F2F0EB;       /* 燕麥灰白 (背景) */
-            --card-bg: #FFFFFF;        /* 純白 (卡片) */
-            --primary: #5C6B6A;        /* 沉穩灰綠 (主色調) */
-            --primary-light: #DEE3E2;  /* 極淡灰綠 (選取狀態) */
-            --secondary: #E5E3DC;      /* 暖灰 (分頁背景) */
-            --text-main: #2E3332;      /* 深鐵灰 (主文字) */
-            --text-muted: #8E9695;     /* 淺鐵灰 (次要文字) */
+            --bg-color: #F2F0EB;       
+            --card-bg: #FFFFFF;        
+            --primary: #5C6B6A;        
+            --primary-light: #DEE3E2;  
+            --secondary: #E5E3DC;      
+            --text-main: #2E3332;      
+            --text-muted: #8E9695;     
             --border-color: rgba(0, 0, 0, 0.05); 
-            --income-color: #718776;   /* 莫蘭迪鼠尾草綠 (收入) */
+            --income-color: #718776;   
             
             --radius-lg: 24px;
             --radius-md: 16px;
@@ -107,14 +107,8 @@
         .budget-wrapper { margin-top: 16px; position: relative; z-index: 2; }
         .budget-info { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; margin-bottom: 8px; opacity: 0.95; }
         .budget-tot { opacity: 0.8; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 8px; cursor: pointer; backdrop-filter: blur(4px); transition: 0.2s;}
-        .budget-tot:active { background: rgba(255,255,255,0.3); transform: scale(0.95); }
         .budget-track { height: 6px; background: rgba(255,255,255,0.2); border-radius: 99px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);}
         .budget-fill { height: 100%; width: 0%; background: var(--bg-color); border-radius: 99px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease; }
-
-        .personal-totals { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.15); position: relative; z-index: 2; }
-        .p-tot { display: flex; flex-direction: column; gap: 4px; }
-        .p-tot span { font-size: 11px; opacity: 0.85; font-weight: 600; }
-        .p-tot strong { font-size: 18px; font-weight: 800; }
 
         .date-picker-wrapper { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow-card); display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border-color); }
         .date-picker-wrapper input { font-size: 16px; font-weight: 600; color: var(--text-main); width: 100%; background: transparent; }
@@ -216,14 +210,12 @@
 
     <main>
         <section id="view-accounting" class="view-container active">
-            
             <div class="balance-card">
                 <div class="b-title">
                     <span>當月共用花費 (噗噗)</span>
                     <span style="font-weight: 400; opacity: 0.8;">依選取月份計算</span>
                 </div>
                 <h2 class="b-amount" id="total-shared">NT$ 0</h2>
-
                 <div class="budget-wrapper">
                     <div class="budget-info">
                         <span id="budget-rem-label">剩餘 NT$ 15,000</span>
@@ -234,17 +226,6 @@
                     </div>
                     <div class="budget-track">
                         <div class="budget-fill" id="budget-fill"></div>
-                    </div>
-                </div>
-
-                <div class="personal-totals">
-                    <div class="p-tot">
-                        <span>🦭 廖噗 (含共用均分)</span>
-                        <strong id="total-p2">$0</strong>
-                    </div>
-                    <div class="p-tot">
-                        <span>🦦 陳噗 (含共用均分)</span>
-                        <strong id="total-p3">$0</strong>
                     </div>
                 </div>
             </div>
@@ -308,7 +289,6 @@
             <div class="date-picker-wrapper" style="margin-top: 10px;">
                 <input type="month" id="analysis-month">
             </div>
-
             <h3 class="section-title">當月個人實際花費 (個人支出 + 共用均分)</h3>
             <div class="dash-summary">
                 <div class="dash-card">
@@ -324,44 +304,36 @@
                     <div class="dc-val net" id="analysis-total-spend" style="color: var(--text-main);">$0</div>
                 </div>
             </div>
-
             <h3 class="section-title">當月支出分類排行</h3>
-            <div class="chart-section" id="cat-chart-container">
-                </div>
+            <div class="chart-section" id="cat-chart-container"></div>
         </section>
 
         <section id="view-settlement" class="view-container">
             <h3 class="section-title" style="margin-top: 10px;">總累積欠款結算板 (無月份限制)</h3>
             <div class="dash-summary">
-                <div class="dash-card full" id="global-settlement-card">
-                    </div>
+                <div class="dash-card full" id="global-settlement-card"></div>
             </div>
-
             <h3 class="section-title">歷史還款紀錄</h3>
-            <div id="settlement-history-list" class="history-list">
-                </div>
+            <div id="settlement-history-list" class="history-list"></div>
         </section>
     </main>
 
     <nav class="bottom-nav">
         <button class="tab-btn active" id="tab-accounting" onclick="switchTab('accounting')">
-            <i class="ph-fill ph-wallet"></i>
-            <span>記帳</span>
+            <i class="ph-fill ph-wallet"></i><span>記帳</span>
         </button>
         <button class="tab-btn" id="tab-analysis" onclick="switchTab('analysis')">
-            <i class="ph-fill ph-chart-pie-slice"></i>
-            <span>當月分析</span>
+            <i class="ph-fill ph-chart-pie-slice"></i><span>當月分析</span>
         </button>
         <button class="tab-btn" id="tab-settlement" onclick="switchTab('settlement')">
-            <i class="ph-fill ph-handshake"></i>
-            <span>累積結算</span>
+            <i class="ph-fill ph-handshake"></i><span>累積結算</span>
         </button>
     </nav>
 
     <div id="toast-container" class="toast-container"></div>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9QRzDsOKhw89lgS03-oOhGpUcfd6szO3-QZ78w_6Mpz18rLnszsFHNyyfzEJntg1m/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyU6NkYTvOYPN3-tzuUxq02kjB-vbUoPScoDpstNM1dmvVVobyqDMfZFCw0ftDzrAbtxQ/exec';
 
         function getSafeStorage(key, defaultVal) {
             try { return localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : defaultVal; } 
@@ -376,7 +348,7 @@
                 analysisMonth: '',  
                 person: '噗噗',   
                 payer: '廖噗',    
-                category: '房租/電費', // 預設改為房租電費
+                category: '房租/電費',
                 recordType: 'expense' 
             },
             updateExpenses(newData) {
@@ -397,23 +369,15 @@
             const yyyy = today.getFullYear();
             const mm = String(today.getMonth() + 1).padStart(2, '0');
             const dd = String(today.getDate()).padStart(2, '0');
-            
             const localDate = `${yyyy}-${mm}-${dd}`;
             const localMonth = `${yyyy}-${mm}`;
-            
             dateInput.value = localDate;
             monthInput.value = localMonth;
-            
             Store.state.date = localDate;
             Store.state.analysisMonth = localMonth;
-
             dateInput.addEventListener('change', (e) => { Store.state.date = e.target.value; renderExpenses(); });
             monthInput.addEventListener('change', (e) => { Store.state.analysisMonth = e.target.value; renderAnalysis(); });
-            
-            try { 
-                renderExpenses(); 
-                if (navigator.onLine) fetchExpenses(); 
-            } catch (e) { console.error(e); }
+            try { renderExpenses(); if (navigator.onLine) fetchExpenses(); } catch (e) { console.error(e); }
         });
 
         function switchTab(tabId) {
@@ -421,12 +385,10 @@
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`view-${tabId}`).classList.add('active');
             document.getElementById(`tab-${tabId}`).classList.add('active');
-            
             let title = '噗噗記帳本';
             if (tabId === 'analysis') title = '當月分析';
             if (tabId === 'settlement') title = '累積結算';
             document.getElementById('header-title').innerText = title;
-
             if (tabId === 'analysis') renderAnalysis();
             if (tabId === 'settlement') renderSettlement();
         }
@@ -434,41 +396,33 @@
         function setRecordType(type) {
             Store.state.recordType = type;
             const isInc = type === 'income';
-            
             const expBtn = document.getElementById('btn-type-exp');
             const incBtn = document.getElementById('btn-type-inc');
             const sharedBtn = document.getElementById('btn-person-shared');
             const payerContainer = document.getElementById('payer-container');
-            
             if (isInc) {
                 expBtn.classList.remove('active');
                 incBtn.classList.add('active');
                 sharedBtn.style.display = 'none'; 
                 payerContainer.classList.remove('active'); 
-                if(Store.state.person === '噗噗') {
-                    selectPerson('廖噗', document.getElementById('btn-person-liao'));
-                }
+                if(Store.state.person === '噗噗') selectPerson('廖噗', document.getElementById('btn-person-liao'));
             } else {
                 incBtn.classList.remove('active');
                 expBtn.classList.add('active');
                 sharedBtn.style.display = 'block'; 
                 payerContainer.classList.add('active'); 
             }
-            
             document.getElementById('cat-expense-grid').style.display = isInc ? 'none' : 'grid';
             document.getElementById('cat-income-grid').style.display = isInc ? 'grid' : 'none';
             document.getElementById('cat-title').innerText = isInc ? '選擇收入來源' : '選擇支出分類';
-
             Store.state.category = isInc ? '薪水' : '房租/電費';
             const grids = document.querySelectorAll(isInc ? '#cat-income-grid .bento-box' : '#cat-expense-grid .bento-box');
             grids.forEach(box => box.classList.remove('active'));
             if(grids.length > 0) grids[0].classList.add('active');
-
             const wrapper = document.getElementById('input-wrapper');
             const sym = document.getElementById('curr-symbol');
             const btn = document.getElementById('submit-btn');
             const input = document.getElementById('item-price');
-            
             if (isInc) {
                 wrapper.style.background = 'rgba(113, 135, 118, 0.12)';
                 sym.style.color = 'var(--income-color)';
@@ -534,384 +488,170 @@
             const rawPrice = parseFloat(item.price) || 0;
             const isIncome = rawPrice < 0; 
             const absPrice = Math.round(Math.abs(rawPrice));
-            
-            let isSameMonth = false;
-            let isSameDay = false;
-            
+            let isSameMonth = false, isSameDay = false;
             let d = new Date(sheetDate);
             let isValidDate = !isNaN(d.getTime());
-
             if (targetMonthStr) {
                 const tmObj = new Date(targetMonthStr + '-01'); 
-                if (isValidDate) {
-                    isSameMonth = (d.getFullYear() === tmObj.getFullYear() && d.getMonth() === tmObj.getMonth());
-                } else if (sheetDate.includes(targetMonthStr.replace('-', '/'))) {
-                    isSameMonth = true;
-                }
-            } else {
-                isSameMonth = true; 
-            }
-
+                if (isValidDate) isSameMonth = (d.getFullYear() === tmObj.getFullYear() && d.getMonth() === tmObj.getMonth());
+                else if (sheetDate.includes(targetMonthStr.replace('-', '/'))) isSameMonth = true;
+            } else isSameMonth = true;
             if (targetDateStr) {
                 const tdObj = new Date(targetDateStr);
-                if (isValidDate) {
-                    isSameDay = (d.getFullYear() === tdObj.getFullYear() && d.getMonth() === tdObj.getMonth() && d.getDate() === tdObj.getDate());
-                } else if (sheetDate === targetDateStr) {
-                    isSameDay = true;
-                }
-            } else {
-                isSameDay = true;
-            }
-
+                if (isValidDate) isSameDay = (d.getFullYear() === tdObj.getFullYear() && d.getMonth() === tdObj.getMonth() && d.getDate() === tdObj.getDate());
+                else if (sheetDate === targetDateStr) isSameDay = true;
+            } else isSameDay = true;
             const safeName = String(item.name).replace(/[<>]/g, "");
-            let person = '噗噗'; 
-            let payer = '未知';
-            let displayName = safeName;
-            
+            let person = '噗噗', payer = '未知', displayName = safeName;
             const tagMatch = safeName.match(/^【(.*?)】(.*)/);
             if (tagMatch) {
-                const fullTag = tagMatch[1];
-                displayName = tagMatch[2].trim();
-                if (fullTag.includes('|')) {
-                    const parts = fullTag.split('|');
-                    person = parts[0];
-                    payer = parts[1];
-                } else {
-                    person = fullTag;
-                    payer = fullTag; 
-                }
+                const fullTag = tagMatch[1]; displayName = tagMatch[2].trim();
+                if (fullTag.includes('|')) { const parts = fullTag.split('|'); person = parts[0]; payer = parts[1]; }
+                else { person = fullTag; payer = fullTag; }
             }
-
             return { ...item, isIncome, absPrice, isSameMonth, isSameDay, person, payer, displayName };
         }
 
         function renderExpenses() {
             const listEl = document.getElementById('expense-list');
             listEl.innerHTML = '';
-            
             let monthlyShared = 0;
-            let monthlyP2 = 0;
-            let monthlyP3 = 0;
             const selectedDayItems = [];
-
             Store.state.expenses.forEach(rawItem => {
                 const item = parseItem(rawItem, Store.state.date, Store.state.date.substring(0,7));
-                
                 if (item.isSameMonth && !item.isIncome && item.cat !== '結清') {
                     if (item.person === '噗噗') monthlyShared += item.absPrice;
-                    else if (item.person === '廖噗') monthlyP2 += item.absPrice;
-                    else if (item.person === '陳噗') monthlyP3 += item.absPrice;
                 }
-                
                 if (item.isSameDay) selectedDayItems.push(item);
             });
-
-            if (selectedDayItems.length === 0) {
-                listEl.innerHTML = `<div style="text-align:center; padding: 40px 20px; color: var(--text-muted); font-weight:600;">本日尚無紀錄</div>`;
-            } else {
+            if (selectedDayItems.length === 0) listEl.innerHTML = `<div style="text-align:center; padding: 40px 20px; color: var(--text-muted); font-weight:600;">本日尚無紀錄</div>`;
+            else {
                 selectedDayItems.forEach(item => {
                     const icon = item.cat === '結清' ? 'ph-handshake' : (EMOJI_MAP[item.cat] || 'ph-ticket');
-                    let incClass = '';
-                    let sign = '';
-                    
-                    if (item.cat === '結清') {
-                        incClass = 'settled';
-                    } else if (item.isIncome) {
-                        incClass = 'inc';
-                        sign = '+';
-                    }
-
+                    let incClass = '', sign = '';
+                    if (item.cat === '結清') incClass = 'settled';
+                    else if (item.isIncome) { incClass = 'inc'; sign = '+'; }
                     let personTagHtml = '';
-                    if (item.cat === '結清') {
-                        personTagHtml = `<span class="h-tag settled">還款紀錄</span>`;
-                    } else if (!item.isIncome) {
-                        if (item.person === '噗噗') {
-                            personTagHtml = `<span class="h-tag shared">共用 (${item.payer}付)</span>`;
-                        } else if (item.person !== item.payer) {
-                            personTagHtml = `<span class="h-tag alert">${item.person} (${item.payer}付)</span>`;
-                        } else {
-                            personTagHtml = `<span class="h-tag">${item.person}</span>`;
-                        }
-                    } else {
-                        personTagHtml = `<span class="h-tag">${item.person}</span>`;
-                    }
-
-                    listEl.innerHTML += `
-                    <div class="h-item">
-                        <div class="h-left">
-                            <div class="h-icon ${incClass}"><i class="ph-fill ${icon}"></i></div>
-                            <div class="h-info">
-                                <h4>${item.displayName} ${personTagHtml}</h4>
-                                <span class="h-cat">${item.cat}</span>
-                            </div>
-                        </div>
-                        <div class="h-right">
-                            <div class="h-price ${incClass}">${sign}$${item.absPrice}</div>
-                            <button class="h-del" onclick="deleteExpense('${item.id}')"><i class="ph-bold ph-trash"></i></button>
-                        </div>
-                    </div>`;
+                    if (item.cat === '結清') personTagHtml = `<span class="h-tag settled">還款紀錄</span>`;
+                    else if (!item.isIncome) {
+                        if (item.person === '噗噗') personTagHtml = `<span class="h-tag shared">共用 (${item.payer}付)</span>`;
+                        else if (item.person !== item.payer) personTagHtml = `<span class="h-tag alert">${item.person} (${item.payer}付)</span>`;
+                        else personTagHtml = `<span class="h-tag">${item.person}</span>`;
+                    } else personTagHtml = `<span class="h-tag">${item.person}</span>`;
+                    listEl.innerHTML += `<div class="h-item"><div class="h-left"><div class="h-icon ${incClass}"><i class="ph-fill ${icon}"></i></div><div class="h-info"><h4>${item.displayName} ${personTagHtml}</h4><span class="h-cat">${item.cat}</span></div></div><div class="h-right"><div class="h-price ${incClass}">${sign}$${item.absPrice}</div><button class="h-del" onclick="deleteExpense('${item.id}')"><i class="ph-bold ph-trash"></i></button></div></div>`;
                 });
             }
-            
-            const actualP2 = monthlyP2 + (monthlyShared / 2);
-            const actualP3 = monthlyP3 + (monthlyShared / 2);
-            
             document.getElementById('total-shared').innerText = `NT$ ${monthlyShared.toLocaleString()}`;
-            document.getElementById('total-p2').innerText = `$${Math.round(actualP2).toLocaleString()}`;
-            document.getElementById('total-p3').innerText = `$${Math.round(actualP3).toLocaleString()}`;
-            
             let currentBudget = Store.state.budget;
             document.getElementById('budget-total-label').innerText = `/ ${(currentBudget/1000).toFixed(1).replace('.0','')}k 預算`;
-
             let spentPercent = (monthlyShared / currentBudget) * 100;
             let remaining = currentBudget - monthlyShared;
-            const fillEl = document.getElementById('budget-fill');
-            const remLabel = document.getElementById('budget-rem-label');
-
+            const fillEl = document.getElementById('budget-fill'), remLabel = document.getElementById('budget-rem-label');
             fillEl.style.width = `${Math.min(spentPercent, 100)}%`;
-
-            if (remaining >= 0) {
-                remLabel.innerText = `剩餘 NT$ ${remaining.toLocaleString()}`;
-                remLabel.style.color = 'rgba(255,255,255,0.95)';
-                fillEl.style.background = spentPercent > 85 ? '#E5E3DC' : 'var(--bg-color)'; 
-            } else {
-                remLabel.innerText = `超支 NT$ ${Math.abs(remaining).toLocaleString()}`;
-                remLabel.style.color = '#EBD9D9'; 
-                fillEl.style.background = '#EBD9D9';
-            }
+            if (remaining >= 0) { remLabel.innerText = `剩餘 NT$ ${remaining.toLocaleString()}`; remLabel.style.color = 'rgba(255,255,255,0.95)'; fillEl.style.background = spentPercent > 85 ? '#E5E3DC' : 'var(--bg-color)'; }
+            else { remLabel.innerText = `超支 NT$ ${Math.abs(remaining).toLocaleString()}`; remLabel.style.color = '#EBD9D9'; fillEl.style.background = '#EBD9D9'; }
         }
 
         function renderAnalysis() {
-            let monthlyShared = 0;
-            let monthlyP2 = 0; 
-            let monthlyP3 = 0; 
-            let totalExp = 0; 
-            let catStats = {};
-
+            let monthlyShared = 0, monthlyP2 = 0, monthlyP3 = 0, totalExp = 0, catStats = {};
             Store.state.expenses.forEach(rawItem => {
                 const item = parseItem(rawItem, '', Store.state.analysisMonth);
-                
                 if (item.isSameMonth && !item.isIncome && item.cat !== '結清') {
-                    totalExp += item.absPrice;
-                    catStats[item.cat] = (catStats[item.cat] || 0) + item.absPrice;
-                    
+                    totalExp += item.absPrice; catStats[item.cat] = (catStats[item.cat] || 0) + item.absPrice;
                     if (item.person === '噗噗') monthlyShared += item.absPrice;
                     else if (item.person === '廖噗') monthlyP2 += item.absPrice;
                     else if (item.person === '陳噗') monthlyP3 += item.absPrice;
                 }
             });
-
-            const actualLiao = Math.round(monthlyP2 + (monthlyShared / 2));
-            const actualChen = Math.round(monthlyP3 + (monthlyShared / 2));
-
+            const actualLiao = Math.round(monthlyP2 + (monthlyShared / 2)), actualChen = Math.round(monthlyP3 + (monthlyShared / 2));
             document.getElementById('analysis-liao-spend').innerText = `$${actualLiao.toLocaleString()}`;
             document.getElementById('analysis-chen-spend').innerText = `$${actualChen.toLocaleString()}`;
             document.getElementById('analysis-total-spend').innerText = `$${totalExp.toLocaleString()}`;
-
             let catHtml = '';
             let sortedCats = Object.keys(catStats).sort((a,b) => catStats[b] - catStats[a]);
-            
-            if(sortedCats.length === 0) {
-                catHtml = '<div style="text-align:center; color:var(--text-muted); font-size:13px;">本月尚無支出資料</div>';
-            } else {
+            if(sortedCats.length === 0) catHtml = '<div style="text-align:center; color:var(--text-muted); font-size:13px;">本月尚無支出資料</div>';
+            else {
                 sortedCats.forEach(cat => {
-                    let val = catStats[cat];
-                    let pct = totalExp === 0 ? 0 : Math.round((val / totalExp) * 100);
+                    let val = catStats[cat], pct = totalExp === 0 ? 0 : Math.round((val / totalExp) * 100);
                     let icon = EMOJI_MAP[cat] || 'ph-ticket';
-                    catHtml += `
-                    <div class="chart-row">
-                        <div class="cr-top">
-                            <div class="cr-name"><i class="ph-fill ${icon}"></i> ${cat}</div>
-                            <div class="cr-val">$${val.toLocaleString()}</div>
-                        </div>
-                        <div class="cr-track"><div class="cr-fill" style="width: ${pct}%; opacity: ${Math.max(0.4, pct/100 + 0.2)}"></div></div>
-                    </div>`;
+                    catHtml += `<div class="chart-row"><div class="cr-top"><div class="cr-name"><i class="ph-fill ${icon}"></i> ${cat}</div><div class="cr-val">$${val.toLocaleString()}</div></div><div class="cr-track"><div class="cr-fill" style="width: ${pct}%; opacity: ${Math.max(0.4, pct/100 + 0.2)}"></div></div></div>`;
                 });
             }
             document.getElementById('cat-chart-container').innerHTML = catHtml;
         }
 
         function renderSettlement() {
-            let sharedPaidByLiao = 0;
-            let sharedPaidByChen = 0;
-            let chenPersonalPaidByLiao = 0;
-            let liaoPersonalPaidByChen = 0;
-            let settledByLiao = 0; 
-            let settledByChen = 0; 
-
-            let historyHtml = '';
-            const historyList = [];
-
+            let sharedPaidByLiao = 0, sharedPaidByChen = 0, chenPaidForLiao = 0, liaoPaidForChen = 0, settledByLiao = 0, settledByChen = 0;
+            let historyHtml = ''; const historyList = [];
             Store.state.expenses.forEach(rawItem => {
                 const item = parseItem(rawItem, '', '');
-                
                 if (!item.isIncome) {
                     if (item.cat === '結清') {
                         if (item.payer === '廖噗') settledByLiao += item.absPrice;
                         if (item.payer === '陳噗') settledByChen += item.absPrice;
                         historyList.push(item);
                     } else {
-                        if (item.person === '噗噗') {
-                            if (item.payer === '廖噗') sharedPaidByLiao += item.absPrice;
-                            if (item.payer === '陳噗') sharedPaidByChen += item.absPrice;
-                        } else if (item.person === '廖噗' && item.payer === '陳噗') {
-                            liaoPersonalPaidByChen += item.absPrice;
-                        } else if (item.person === '陳噗' && item.payer === '廖噗') {
-                            chenPersonalPaidByLiao += item.absPrice;
-                        }
+                        if (item.person === '噗噗') { if (item.payer === '廖噗') sharedPaidByLiao += item.absPrice; if (item.payer === '陳噗') sharedPaidByChen += item.absPrice; }
+                        else if (item.person === '廖噗' && item.payer === '陳噗') chenPaidForLiao += item.absPrice;
+                        else if (item.person === '陳噗' && item.payer === '廖噗') liaoPaidForChen += item.absPrice;
                     }
                 }
             });
-
-            let liaoBalance = (sharedPaidByLiao / 2) - (sharedPaidByChen / 2) 
-                            + chenPersonalPaidByLiao - liaoPersonalPaidByChen 
-                            - settledByChen + settledByLiao;
-            
-            liaoBalance = Math.round(liaoBalance);
-
+            let liaoBalance = Math.round((sharedPaidByLiao / 2) - (sharedPaidByChen / 2) + liaoPaidForChen - chenPaidForLiao - settledByChen + settledByLiao);
             const cardEl = document.getElementById('global-settlement-card');
-            
-            if (sharedPaidByLiao === 0 && sharedPaidByChen === 0 && chenPersonalPaidByLiao === 0 && liaoPersonalPaidByChen === 0 && settledByLiao === 0 && settledByChen === 0) {
-                cardEl.innerHTML = `
-                    <span class="dc-title">目前累積餘額</span>
-                    <div class="dc-val net" style="color: var(--text-muted);">目前無任何帳目產生</div>
-                `;
-            } else if (liaoBalance === 0) {
-                cardEl.innerHTML = `
-                    <span class="dc-title">目前累積餘額</span>
-                    <div class="dc-val net" style="color: var(--income-color);">歷史帳目已完全結清！🎉</div>
-                `;
-            } else if (liaoBalance > 0) {
-                cardEl.innerHTML = `
-                    <span class="dc-title">目前累積餘額 (陳噗應付款)</span>
-                    <div class="dc-val net">🦦 陳噗 <span style="font-size:16px; color:var(--text-muted);">給</span> 🦭 廖噗<br>$${liaoBalance.toLocaleString()}</div>
-                    <button class="btn-settle" onclick="settleDebt(${liaoBalance}, '陳噗')">一鍵結清 (記錄陳噗還款)</button>
-                `;
-            } else {
-                const absBalance = Math.abs(liaoBalance);
-                cardEl.innerHTML = `
-                    <span class="dc-title">目前累積餘額 (廖噗應付款)</span>
-                    <div class="dc-val net">🦭 廖噗 <span style="font-size:16px; color:var(--text-muted);">給</span> 🦦 陳噗<br>$${absBalance.toLocaleString()}</div>
-                    <button class="btn-settle" onclick="settleDebt(${absBalance}, '廖噗')">一鍵結清 (記錄廖噗還款)</button>
-                `;
-            }
-
-            if(historyList.length === 0) {
-                historyHtml = '<div style="text-align:center; padding: 20px; color:var(--text-muted); font-weight:600;">尚無任何歷史結清紀錄</div>';
-            } else {
-                historyList.reverse().forEach(item => {
-                    historyHtml += `
-                    <div class="h-item">
-                        <div class="h-left">
-                            <div class="h-icon settled"><i class="ph-fill ph-handshake"></i></div>
-                            <div class="h-info">
-                                <h4>${item.displayName}</h4>
-                                <span class="h-cat">${item.date}</span>
-                            </div>
-                        </div>
-                        <div class="h-right">
-                            <div class="h-price settled">$${item.absPrice}</div>
-                            <button class="h-del" onclick="deleteExpense('${item.id}')"><i class="ph-bold ph-trash"></i></button>
-                        </div>
-                    </div>`;
-                });
-            }
+            if (sharedPaidByLiao + sharedPaidByChen + chenPaidForLiao + liaoPaidForChen + settledByLiao + settledByChen === 0) cardEl.innerHTML = `<span class="dc-title">目前累積餘額</span><div class="dc-val net" style="color: var(--text-muted);">目前無任何帳目產生</div>`;
+            else if (liaoBalance === 0) cardEl.innerHTML = `<span class="dc-title">目前累積餘額</span><div class="dc-val net" style="color: var(--income-color);">歷史帳目已完全結清！🎉</div>`;
+            else if (liaoBalance > 0) cardEl.innerHTML = `<span class="dc-title">目前累積餘額 (陳噗應付款)</span><div class="dc-val net">🦦 陳噗 <span style="font-size:16px; color:var(--text-muted);">給</span> 🦭 廖噗<br>$${liaoBalance.toLocaleString()}</div><button class="btn-settle" onclick="settleDebt(${liaoBalance}, '陳噗')">一鍵結清 (記錄陳噗還款)</button>`;
+            else cardEl.innerHTML = `<span class="dc-title">目前累積餘額 (廖噗應付款)</span><div class="dc-val net">🦭 廖噗 <span style="font-size:16px; color:var(--text-muted);">給</span> 🦦 陳噗<br>$${Math.abs(liaoBalance).toLocaleString()}</div><button class="btn-settle" onclick="settleDebt(${Math.abs(liaoBalance)}, '廖噗')">一鍵結清 (記錄廖噗還款)</button>`;
+            if(historyList.length === 0) historyHtml = '<div style="text-align:center; padding: 20px; color:var(--text-muted); font-weight:600;">尚無歷史結清紀錄</div>';
+            else historyList.reverse().forEach(item => {
+                historyHtml += `<div class="h-item"><div class="h-left"><div class="h-icon settled"><i class="ph-fill ph-handshake"></i></div><div class="h-info"><h4>${item.displayName}</h4><span class="h-cat">${item.date}</span></div></div><div class="h-right"><div class="h-price settled">$${item.absPrice}</div><button class="h-del" onclick="deleteExpense('${item.id}')"><i class="ph-bold ph-trash"></i></button></div></div>`;
+            });
             document.getElementById('settlement-history-list').innerHTML = historyHtml;
         }
 
         async function settleDebt(amount, payer) {
-            const operator = prompt(`確定要記錄「${payer}」已經還款 $${amount} 嗎？\n\n請問是誰按下這個結清按鈕的？\n(請輸入 廖噗 或 陳噗，以此署名記錄)`, payer);
-            if (!operator) return; 
-            
-            const finalOperator = operator.includes('廖') ? '廖噗' : (operator.includes('陳') ? '陳噗' : operator);
-
+            const operator = prompt(`確定要記錄「${payer}」已還款 $${amount}？\n請輸入操作人 (廖噗 或 陳噗) 以署名：`, payer);
+            if (!operator) return;
+            const finalOp = operator.includes('廖') ? '廖噗' : (operator.includes('陳') ? '陳噗' : operator);
             const newId = Date.now().toString();
             const today = new Date();
             const localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-
-            const newExpenseObj = { 
-                id: newId, 
-                date: localDate, 
-                cat: '結清', 
-                name: `【結清|${payer}】${finalOperator} 操作還款確認`, 
-                price: amount 
-            };
-            
-            Store.updateExpenses([...Store.state.expenses, newExpenseObj]);
+            const newObj = { id: newId, date: localDate, cat: '結清', name: `【結清|${payer}】${finalOp} 操作還款確認`, price: amount };
+            Store.updateExpenses([...Store.state.expenses, newObj]);
             renderSettlement();
             showToast(`已成功記錄 ${payer} 的還款！`);
-
-            try {
-                const params = new URLSearchParams({ action: 'add', ...newExpenseObj });
-                await fetch(SCRIPT_URL, { method: 'POST', body: params });
-                fetchExpenses();
-            } catch (err) { showToast('背景同步失敗，已存於本機', 'error'); }
+            try { await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ action: 'add', ...newObj }) }); fetchExpenses(); } catch (err) { showToast('背景同步失敗，已存於本機', 'error'); }
         }
 
         async function fetchExpenses() {
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=read&t=${Date.now()}`);
                 const freshData = await res.json();
-                if (Array.isArray(freshData)) {
-                    Store.updateExpenses(freshData);
-                    renderExpenses();
-                    if(document.getElementById('view-analysis').classList.contains('active')) renderAnalysis();
-                    if(document.getElementById('view-settlement').classList.contains('active')) renderSettlement();
-                }
-            } catch (err) { console.error("Fetch Data Error:", err); }
+                if (Array.isArray(freshData)) { Store.updateExpenses(freshData); renderExpenses(); if(document.getElementById('view-analysis').classList.contains('active')) renderAnalysis(); if(document.getElementById('view-settlement').classList.contains('active')) renderSettlement(); }
+            } catch (err) { console.error(err); }
         }
 
         async function addExpense() {
-            const nameEl = document.getElementById('item-name');
-            const priceEl = document.getElementById('item-price');
-            const inputPrice = parseFloat(priceEl.value); 
-            
+            const nameEl = document.getElementById('item-name'), priceEl = document.getElementById('item-price'), inputPrice = parseFloat(priceEl.value); 
             if (isNaN(inputPrice) || inputPrice <= 0) return showToast('請輸入有效金額', 'error'); 
-            
-            let baseName = nameEl.value.trim() || Store.state.category;
-            let isInc = Store.state.recordType === 'income';
-            let finalName = baseName;
-            
-            if (!isInc) {
-                finalName = `【${Store.state.person}|${Store.state.payer}】${baseName}`;
-            } else {
-                finalName = `【${Store.state.person}】${baseName}`; 
-            }
-            
+            let baseName = nameEl.value.trim() || Store.state.category, isInc = Store.state.recordType === 'income', finalName = '';
+            if (!isInc) finalName = `【${Store.state.person}|${Store.state.payer}】${baseName}`;
+            else finalName = `【${Store.state.person}】${baseName}`; 
             let finalPrice = isInc ? -Math.abs(Math.round(inputPrice)) : Math.abs(Math.round(inputPrice));
-            
             const newId = Date.now().toString();
-            const newExpenseObj = { id: newId, date: Store.state.date, cat: Store.state.category, name: finalName, price: finalPrice };
-            
-            Store.updateExpenses([...Store.state.expenses, newExpenseObj]);
-            renderExpenses();
-            
-            nameEl.value = ''; priceEl.value = ''; priceEl.blur(); 
-            showToast(`已新增一筆${isInc ? '收入' : '花費'}`);
-
-            try {
-                const params = new URLSearchParams({ action: 'add', ...newExpenseObj });
-                await fetch(SCRIPT_URL, { method: 'POST', body: params });
-                fetchExpenses();
-            } catch (err) { showToast('背景同步失敗，已存於本機', 'error'); }
+            const newObj = { id: newId, date: Store.state.date, cat: Store.state.category, name: finalName, price: finalPrice };
+            Store.updateExpenses([...Store.state.expenses, newObj]); renderExpenses();
+            nameEl.value = ''; priceEl.value = ''; priceEl.blur(); showToast(`已新增${isInc ? '收入' : '花費'}`);
+            try { await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ action: 'add', ...newObj }) }); fetchExpenses(); } catch (err) { showToast('同步失敗，已存於本機', 'error'); }
         }
 
         async function deleteExpense(id) {
-            if (!confirm('確定刪除此筆紀錄？')) return;
+            if (!confirm('確定刪除此紀錄？(後端會保留刪除日誌)')) return;
             const original = [...Store.state.expenses]; 
             Store.updateExpenses(Store.state.expenses.filter(item => String(item.id) !== String(id)));
-            renderExpenses(); 
-            if(document.getElementById('view-analysis').classList.contains('active')) renderAnalysis();
-            if(document.getElementById('view-settlement').classList.contains('active')) renderSettlement();
-
-            try { 
-                await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ action: 'delete', id: String(id) }) }); 
-                showToast('紀錄已刪除');
-                fetchExpenses();
-            } catch (err) { 
-                Store.updateExpenses(original); renderExpenses(); 
-                showToast('刪除失敗', 'error');
-            }
+            renderExpenses(); if(document.getElementById('view-analysis').classList.contains('active')) renderAnalysis(); if(document.getElementById('view-settlement').classList.contains('active')) renderSettlement();
+            try { await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ action: 'delete', id: String(id) }) }); showToast('紀錄已從畫面移除'); fetchExpenses(); } catch (err) { Store.updateExpenses(original); renderExpenses(); showToast('刪除失敗', 'error'); }
         }
     </script>
 </body>
