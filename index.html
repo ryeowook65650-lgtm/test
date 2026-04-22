@@ -107,8 +107,14 @@
         .budget-wrapper { margin-top: 16px; position: relative; z-index: 2; }
         .budget-info { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; margin-bottom: 8px; opacity: 0.95; }
         .budget-tot { opacity: 0.8; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 8px; cursor: pointer; backdrop-filter: blur(4px); transition: 0.2s;}
+        .budget-tot:active { background: rgba(255,255,255,0.3); transform: scale(0.95); }
         .budget-track { height: 6px; background: rgba(255,255,255,0.2); border-radius: 99px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);}
         .budget-fill { height: 100%; width: 0%; background: var(--bg-color); border-radius: 99px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease; }
+
+        .personal-totals { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.15); position: relative; z-index: 2; }
+        .p-tot { display: flex; flex-direction: column; gap: 4px; }
+        .p-tot span { font-size: 11px; opacity: 0.85; font-weight: 600; }
+        .p-tot strong { font-size: 18px; font-weight: 800; }
 
         .date-picker-wrapper { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow-card); display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border-color); }
         .date-picker-wrapper input { font-size: 16px; font-weight: 600; color: var(--text-main); width: 100%; background: transparent; }
@@ -218,14 +224,24 @@
                 <h2 class="b-amount" id="total-shared">NT$ 0</h2>
                 <div class="budget-wrapper">
                     <div class="budget-info">
-                        <span id="budget-rem-label">剩餘 NT$ 15,000</span>
+                        <span id="budget-rem-label">總剩餘 NT$ 15,000</span>
                         <span class="budget-tot" onclick="editBudget()">
-                            <span id="budget-total-label">/ 15k 預算</span>
+                            <span id="budget-total-label">/ 15k 總預算</span>
                             <i class="ph-bold ph-pencil-simple"></i>
                         </span>
                     </div>
                     <div class="budget-track">
                         <div class="budget-fill" id="budget-fill"></div>
+                    </div>
+                </div>
+                <div class="personal-totals">
+                    <div class="p-tot">
+                        <span>🦭 廖噗 (含共用均分)</span>
+                        <strong id="total-p2">$0</strong>
+                    </div>
+                    <div class="p-tot">
+                        <span>🦦 陳噗 (含共用均分)</span>
+                        <strong id="total-p3">$0</strong>
                     </div>
                 </div>
             </div>
@@ -275,7 +291,7 @@
                 <div class="price-action-row">
                     <div class="price-input-wrapper" id="input-wrapper">
                         <div class="curr-toggle" id="curr-symbol">$</div>
-                        <input type="number" id="item-price" placeholder="輸入金額" min="0" step="1">
+                        <input type="number" id="item-price" placeholder="輸入金額" min="0" step="1" inputmode="numeric" pattern="[0-9]*">
                     </div>
                     <button class="submit-fab" id="submit-btn" onclick="addExpense()"><i class="ph-bold ph-plus"></i></button>
                 </div>
@@ -461,7 +477,7 @@
 
         function editBudget() {
             const current = Store.state.budget;
-            const input = prompt("請輸入共用花費的每月預算：", current);
+            const input = prompt("請輸入總花費的每月預算：", current);
             if (input !== null) {
                 const num = parseInt(input.replace(/[^\d]/g, ''), 10);
                 if (!isNaN(num) && num > 0) {
@@ -515,15 +531,24 @@
         function renderExpenses() {
             const listEl = document.getElementById('expense-list');
             listEl.innerHTML = '';
+            
             let monthlyShared = 0;
+            let monthlyP2 = 0;
+            let monthlyP3 = 0;
+            let monthlyTotal = 0; // 當月總花費（算進度條用的）
             const selectedDayItems = [];
+            
             Store.state.expenses.forEach(rawItem => {
                 const item = parseItem(rawItem, Store.state.date, Store.state.date.substring(0,7));
                 if (item.isSameMonth && !item.isIncome && item.cat !== '結清') {
+                    monthlyTotal += item.absPrice;
                     if (item.person === '噗噗') monthlyShared += item.absPrice;
+                    else if (item.person === '廖噗') monthlyP2 += item.absPrice;
+                    else if (item.person === '陳噗') monthlyP3 += item.absPrice;
                 }
                 if (item.isSameDay) selectedDayItems.push(item);
             });
+
             if (selectedDayItems.length === 0) listEl.innerHTML = `<div style="text-align:center; padding: 40px 20px; color: var(--text-muted); font-weight:600;">本日尚無紀錄</div>`;
             else {
                 selectedDayItems.forEach(item => {
@@ -541,15 +566,32 @@
                     listEl.innerHTML += `<div class="h-item"><div class="h-left"><div class="h-icon ${incClass}"><i class="ph-fill ${icon}"></i></div><div class="h-info"><h4>${item.displayName} ${personTagHtml}</h4><span class="h-cat">${item.cat}</span></div></div><div class="h-right"><div class="h-price ${incClass}">${sign}$${item.absPrice}</div><button class="h-del" onclick="deleteExpense('${item.id}')"><i class="ph-bold ph-trash"></i></button></div></div>`;
                 });
             }
+
+            const actualP2 = monthlyP2 + (monthlyShared / 2);
+            const actualP3 = monthlyP3 + (monthlyShared / 2);
+
             document.getElementById('total-shared').innerText = `NT$ ${monthlyShared.toLocaleString()}`;
+            document.getElementById('total-p2').innerText = `$${Math.round(actualP2).toLocaleString()}`;
+            document.getElementById('total-p3').innerText = `$${Math.round(actualP3).toLocaleString()}`;
+            
             let currentBudget = Store.state.budget;
-            document.getElementById('budget-total-label').innerText = `/ ${(currentBudget/1000).toFixed(1).replace('.0','')}k 預算`;
-            let spentPercent = (monthlyShared / currentBudget) * 100;
-            let remaining = currentBudget - monthlyShared;
+            document.getElementById('budget-total-label').innerText = `/ ${(currentBudget/1000).toFixed(1).replace('.0','')}k 總預算`;
+            
+            // 進度條改為使用 monthlyTotal 計算
+            let spentPercent = (monthlyTotal / currentBudget) * 100;
+            let remaining = currentBudget - monthlyTotal;
             const fillEl = document.getElementById('budget-fill'), remLabel = document.getElementById('budget-rem-label');
             fillEl.style.width = `${Math.min(spentPercent, 100)}%`;
-            if (remaining >= 0) { remLabel.innerText = `剩餘 NT$ ${remaining.toLocaleString()}`; remLabel.style.color = 'rgba(255,255,255,0.95)'; fillEl.style.background = spentPercent > 85 ? '#E5E3DC' : 'var(--bg-color)'; }
-            else { remLabel.innerText = `超支 NT$ ${Math.abs(remaining).toLocaleString()}`; remLabel.style.color = '#EBD9D9'; fillEl.style.background = '#EBD9D9'; }
+            
+            if (remaining >= 0) { 
+                remLabel.innerText = `總剩餘 NT$ ${remaining.toLocaleString()}`; 
+                remLabel.style.color = 'rgba(255,255,255,0.95)'; 
+                fillEl.style.background = spentPercent > 85 ? '#E5E3DC' : 'var(--bg-color)'; 
+            } else { 
+                remLabel.innerText = `總超支 NT$ ${Math.abs(remaining).toLocaleString()}`; 
+                remLabel.style.color = '#EBD9D9'; 
+                fillEl.style.background = '#EBD9D9'; 
+            }
         }
 
         function renderAnalysis() {
