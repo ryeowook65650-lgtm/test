@@ -111,7 +111,6 @@
         .budget-track { height: 6px; background: rgba(255,255,255,0.2); border-radius: 99px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);}
         .budget-fill { height: 100%; width: 0%; background: var(--bg-color); border-radius: 99px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease; }
 
-        /* 個人花費小計 */
         .personal-totals { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2); position: relative; z-index: 2; }
         .p-tot { display: flex; flex-direction: column; gap: 4px; }
         .p-tot span { font-size: 12px; opacity: 0.9; font-weight: 600; }
@@ -120,7 +119,6 @@
         .date-picker-wrapper { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow-card); display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border-color); }
         .date-picker-wrapper input { font-size: 16px; font-weight: 600; color: var(--text-main); width: 100%; background: transparent; }
 
-        /* 收支切換按鈕強化 */
         .type-segment { display: flex; gap: 8px; margin-bottom: 20px; }
         .type-btn { flex: 1; text-align: center; padding: 12px 0; font-size: 15px; font-weight: 800; border-radius: 12px; transition: all 0.3s ease; background: var(--secondary); color: #7a7067; border: 2px solid transparent;}
         .type-btn.active.expense { background: var(--card-bg) !important; color: var(--primary) !important; border-color: var(--primary) !important; box-shadow: var(--shadow-card); }
@@ -130,7 +128,7 @@
         .seg-btn { flex: 1; text-align: center; padding: 10px 0; font-size: 14px; font-weight: 600; color: #7a7067; border-radius: 8px; transition: 0.2s; }
         .seg-btn.active { background: #FFF; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 
-        /* 代墊人專屬區塊 */
+        /* 代墊人專屬區塊 (全面開放給支出) */
         .payer-segment { display: none; align-items: center; gap: 12px; margin-top: -10px; margin-bottom: 20px; background: rgba(224, 215, 207, 0.3); padding: 8px 12px; border-radius: 12px; border: 1px dashed rgba(84, 140, 146, 0.3); animation: fadeIn 0.3s ease forwards; }
         .payer-segment.active { display: flex; }
         .payer-segment span { font-size: 13px; font-weight: 800; color: var(--primary); flex-shrink: 0; }
@@ -164,12 +162,16 @@
         .h-left { display: flex; align-items: center; gap: 12px; }
         .h-icon { width: 44px; height: 44px; background: rgba(224, 215, 207, 0.4); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--primary); }
         .h-icon.inc { background: rgba(76, 175, 80, 0.1); color: var(--income-color); }
+        .h-icon.settled { background: #d4edda; color: #155724; }
         .h-info h4 { margin: 0 0 4px; font-size: 15px; font-weight: 600; color: var(--text-main); }
         .h-tag { font-size: 11px; background: var(--primary-light); padding: 3px 6px; border-radius: 4px; font-weight: 800; color: #2c4d51; margin-left: 6px; display: inline-block;}
-        .h-tag.shared { background: #ffe4b5; color: #d97706; } /* 共用標籤特殊色 */
+        .h-tag.shared { background: #ffe4b5; color: #d97706; } 
+        .h-tag.alert { background: #f8d7da; color: #721c24; } /* 別人代墊的警告色 */
+        .h-tag.settled { background: #d4edda; color: #155724; } 
         .h-right { text-align: right; }
         .h-price { font-size: 17px; font-weight: 800; color: var(--primary); margin-bottom: 2px; }
         .h-price.inc { color: var(--income-color); }
+        .h-price.settled { color: #155724; }
         .h-cat { font-size: 12px; color: var(--text-muted); font-weight: 600; }
         .h-del { color: #FF3B30; padding: 10px; margin-left: 5px; font-size: 20px; cursor: pointer; border: none; background: none;}
 
@@ -182,7 +184,10 @@
         .dc-title { font-size: 13px; color: var(--text-muted); font-weight: 800; margin-bottom: 8px; display: block; }
         .dc-val { font-size: 22px; font-weight: 800; color: var(--text-main); }
         .dc-val.exp { color: var(--primary); }
-        .dc-val.net { font-size: 26px; color: var(--primary); margin: 8px 0; }
+        .dc-val.net { font-size: 24px; color: var(--primary); margin: 8px 0; line-height: 1.4; }
+        
+        .btn-settle { background: var(--income-color); color: #FFF; border-radius: 12px; padding: 12px 20px; font-size: 15px; font-weight: 800; width: 100%; margin-top: 12px; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3); transition: 0.2s;}
+        .btn-settle:active { transform: scale(0.95); opacity: 0.8; }
 
         .chart-section { background: var(--card-bg); padding: 20px; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); border: 1px solid var(--border-color); margin-bottom: 24px; }
         .chart-row { margin-bottom: 16px; }
@@ -261,16 +266,16 @@
             </div>
 
             <div class="segment-wrapper" id="person-segment">
-                <button class="seg-btn active" onclick="selectPerson('噗噗', this)">👥 共用</button>
-                <button class="seg-btn" onclick="selectPerson('廖噗', this)">👩🏻 廖噗</button>
-                <button class="seg-btn" onclick="selectPerson('陳噗', this)">👦🏻 陳噗</button>
+                <button class="seg-btn active" id="btn-person-shared" onclick="selectPerson('噗噗', this)">👥 共用</button>
+                <button class="seg-btn" id="btn-person-liao" onclick="selectPerson('廖噗', this)">👩🏻 廖噗</button>
+                <button class="seg-btn" id="btn-person-chen" onclick="selectPerson('陳噗', this)">👦🏻 陳噗</button>
             </div>
 
             <div class="payer-segment active" id="payer-container">
-                <span>由誰代墊：</span>
+                <span>由誰先付：</span>
                 <div class="segment-wrapper" style="margin-bottom: 0; flex: 1;">
-                    <button class="seg-btn active" onclick="selectPayer('廖噗', this)">👩🏻 廖噗</button>
-                    <button class="seg-btn" onclick="selectPayer('陳噗', this)">👦🏻 陳噗</button>
+                    <button class="seg-btn active" id="payer-liao" onclick="selectPayer('廖噗', this)">👩🏻 廖噗</button>
+                    <button class="seg-btn" id="payer-chen" onclick="selectPayer('陳噗', this)">👦🏻 陳噗</button>
                 </div>
             </div>
 
@@ -314,24 +319,21 @@
                 <input type="month" id="analysis-month">
             </div>
 
-            <h3 class="section-title">共用花費結算板</h3>
+            <h3 class="section-title">欠款結算板 (包含共用分攤與互相代墊)</h3>
             <div class="dash-summary">
-                <div class="dash-card full">
-                    <span class="dc-title">結算結果 (不含個人支出與收入)</span>
-                    <div class="dc-val net" id="settlement-text">計算中...</div>
-                    <div style="font-size: 13px; color: var(--text-muted); font-weight: 600;" id="settlement-sub">共用總額 $0 (每人應分攤 $0)</div>
-                </div>
+                <div class="dash-card full" id="settlement-card">
+                    </div>
                 <div class="dash-card">
-                    <span class="dc-title">👩🏻 廖噗已代墊</span>
+                    <span class="dc-title">👩🏻 廖噗 當月總代墊</span>
                     <div class="dc-val exp" id="dash-liao-paid">$0</div>
                 </div>
                 <div class="dash-card">
-                    <span class="dc-title">👦🏻 陳噗已代墊</span>
+                    <span class="dc-title">👦🏻 陳噗 當月總代墊</span>
                     <div class="dc-val exp" id="dash-chen-paid">$0</div>
                 </div>
             </div>
 
-            <h3 class="section-title">整體支出分類排行</h3>
+            <h3 class="section-title">整體支出分類排行 (不含還款紀錄)</h3>
             <div class="chart-section" id="cat-chart-container">
                 </div>
         </section>
@@ -344,7 +346,7 @@
         </button>
         <button class="tab-btn" id="tab-analysis" onclick="switchTab('analysis')">
             <i class="ph-fill ph-handshake"></i>
-            <span>結算分析</span>
+            <span>當月結算</span>
         </button>
     </nav>
 
@@ -354,12 +356,8 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9QRzDsOKhw89lgS03-oOhGpUcfd6szO3-QZ78w_6Mpz18rLnszsFHNyyfzEJntg1m/exec';
 
         function getSafeStorage(key, defaultVal) {
-            try {
-                const val = localStorage.getItem(key);
-                return val ? JSON.parse(val) : defaultVal;
-            } catch (e) {
-                return defaultVal;
-            }
+            try { return localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : defaultVal; } 
+            catch (e) { return defaultVal; }
         }
 
         const Store = {
@@ -401,31 +399,18 @@
             Store.state.date = localDate;
             Store.state.analysisMonth = localMonth;
 
-            dateInput.addEventListener('change', (e) => {
-                Store.state.date = e.target.value;
-                renderExpenses();
-            });
-
-            monthInput.addEventListener('change', (e) => {
-                Store.state.analysisMonth = e.target.value;
-                renderAnalysis();
-            });
+            dateInput.addEventListener('change', (e) => { Store.state.date = e.target.value; renderExpenses(); });
+            monthInput.addEventListener('change', (e) => { Store.state.analysisMonth = e.target.value; renderAnalysis(); });
             
-            try {
-                renderExpenses();
-                if (navigator.onLine) fetchExpenses();
-            } catch (e) { console.error(e); }
+            try { renderExpenses(); if (navigator.onLine) fetchExpenses(); } catch (e) { console.error(e); }
         });
 
         function switchTab(tabId) {
             document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            
             document.getElementById(`view-${tabId}`).classList.add('active');
             document.getElementById(`tab-${tabId}`).classList.add('active');
-            
             document.getElementById('header-title').innerText = tabId === 'analysis' ? '當月結算' : '噗噗記帳本';
-
             if (tabId === 'analysis') renderAnalysis();
         }
 
@@ -433,16 +418,24 @@
             Store.state.recordType = type;
             const isInc = type === 'income';
             
-            // 強制移除與加入 Class 保證按鈕變色
             const expBtn = document.getElementById('btn-type-exp');
             const incBtn = document.getElementById('btn-type-inc');
+            const sharedBtn = document.getElementById('btn-person-shared');
+            const payerContainer = document.getElementById('payer-container');
             
             if (isInc) {
                 expBtn.classList.remove('active');
                 incBtn.classList.add('active');
+                sharedBtn.style.display = 'none'; // 隱藏共用
+                payerContainer.classList.remove('active'); // 隱藏代墊人
+                if(Store.state.person === '噗噗') {
+                    selectPerson('廖噗', document.getElementById('btn-person-liao'));
+                }
             } else {
                 incBtn.classList.remove('active');
                 expBtn.classList.add('active');
+                sharedBtn.style.display = 'block'; // 顯示共用
+                payerContainer.classList.add('active'); // 顯示代墊人
             }
             
             document.getElementById('cat-expense-grid').style.display = isInc ? 'none' : 'grid';
@@ -459,7 +452,6 @@
             const btn = document.getElementById('submit-btn');
             const input = document.getElementById('item-price');
             
-            // 下方顏色一併連動
             if (isInc) {
                 wrapper.style.background = 'rgba(76, 175, 80, 0.1)';
                 sym.style.color = 'var(--income-color)';
@@ -481,20 +473,11 @@
             Store.state.person = person;
             document.querySelectorAll('#person-segment .seg-btn').forEach(btn => btn.classList.remove('active'));
             el.classList.add('active');
-            
-            // 只有選擇「共用」時，才會顯示代墊人選項
-            const payerContainer = document.getElementById('payer-container');
-            if(person === '噗噗') {
-                payerContainer.classList.add('active');
-            } else {
-                payerContainer.classList.remove('active');
-            }
         }
 
         function selectPayer(payer, el) {
             Store.state.payer = payer;
-            const parent = el.parentElement;
-            parent.querySelectorAll('.seg-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#payer-container .seg-btn').forEach(btn => btn.classList.remove('active'));
             el.classList.add('active');
         }
 
@@ -515,29 +498,21 @@
                     localStorage.setItem('monthly_budget', num);
                     renderExpenses();
                     showToast('預算已更新');
-                } else {
-                    showToast('請輸入有效數字', 'error');
-                }
+                } else { showToast('請輸入有效數字', 'error'); }
             }
         }
 
-        function manualSync() {
-            showToast('正在同步資料...', 'success');
-            fetchExpenses();
-        }
+        function manualSync() { showToast('正在同步資料...', 'success'); fetchExpenses(); }
 
         function showToast(msg, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.innerHTML = `<i class="ph-fill ${type === 'success' ? 'ph-check-circle' : 'ph-warning-circle'}"></i> <span>${msg}</span>`;
             document.getElementById('toast-container').appendChild(toast);
-            setTimeout(() => {
-                toast.classList.add('hide');
-                setTimeout(() => toast.remove(), 300);
-            }, 2500);
+            setTimeout(() => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
-        // 解析資料核心：從字串中萃取「記錄人」與「代墊人」
+        // 解析資料核心：從字串中萃取「記錄對象」與「代墊人」
         function parseItem(item, targetDateStr, targetMonthStr) {
             const sheetDate = String(item.date).trim();
             const rawPrice = parseFloat(item.price) || 0;
@@ -563,7 +538,7 @@
 
             const safeName = String(item.name).replace(/[<>]/g, "");
             let person = '噗噗'; 
-            let payer = '未知';
+            let payer = '廖噗'; // 預設
             let displayName = safeName;
             
             // 解析標籤格式：例如 【噗噗|廖噗】 或 【廖噗】
@@ -577,7 +552,7 @@
                     payer = parts[1];
                 } else {
                     person = fullTag;
-                    payer = fullTag; // 個人的話，代墊人就是自己
+                    payer = fullTag; // 舊資料無代墊人，預設為自己
                 }
             }
 
@@ -596,7 +571,7 @@
             Store.state.expenses.forEach(rawItem => {
                 const item = parseItem(rawItem, Store.state.date, Store.state.date.substring(0,7));
                 
-                if (item.isSameMonth && !item.isIncome) {
+                if (item.isSameMonth && !item.isIncome && item.cat !== '結清') {
                     if (item.person === '噗噗') monthlyShared += item.absPrice;
                     else if (item.person === '廖噗') monthlyP2 += item.absPrice;
                     else if (item.person === '陳噗') monthlyP3 += item.absPrice;
@@ -608,18 +583,31 @@
                 listEl.innerHTML = `<div style="text-align:center; padding: 40px 20px; color: var(--text-muted); font-weight:600;">本日尚無紀錄</div>`;
             } else {
                 selectedDayItems.forEach(item => {
-                    const icon = EMOJI_MAP[item.cat] || 'ph-ticket';
-                    const incClass = item.isIncome ? 'inc' : '';
-                    const sign = item.isIncome ? '+' : '';
+                    const icon = item.cat === '結清' ? 'ph-handshake' : (EMOJI_MAP[item.cat] || 'ph-ticket');
+                    let incClass = '';
+                    let sign = '';
                     
+                    if (item.cat === '結清') {
+                        incClass = 'settled';
+                    } else if (item.isIncome) {
+                        incClass = 'inc';
+                        sign = '+';
+                    }
+
                     // 標籤顯示邏輯
                     let personTagHtml = '';
-                    if (!item.isIncome) {
+                    if (item.cat === '結清') {
+                        personTagHtml = `<span class="h-tag settled">💸 結算還款</span>`;
+                    } else if (!item.isIncome) {
                         if (item.person === '噗噗') {
-                            personTagHtml = `<span class="h-tag shared">👥 共用 (${item.payer}墊)</span>`;
+                            personTagHtml = `<span class="h-tag shared">👥 共用 (${item.payer}付)</span>`;
+                        } else if (item.person !== item.payer) {
+                            personTagHtml = `<span class="h-tag alert">⚠️ ${item.person} (${item.payer}付)</span>`;
                         } else {
                             personTagHtml = `<span class="h-tag">${item.person}</span>`;
                         }
+                    } else {
+                        personTagHtml = `<span class="h-tag">${item.person}</span>`;
                     }
 
                     listEl.innerHTML += `
@@ -667,50 +655,79 @@
         function renderAnalysis() {
             let sharedPaidByLiao = 0;
             let sharedPaidByChen = 0;
-            let totalExp = 0; // 用於計算分類圓餅圖的總花費
+            let chenPersonalPaidByLiao = 0;
+            let liaoPersonalPaidByChen = 0;
+            
+            let settledByLiao = 0; // 廖噗付給陳噗的結算金額
+            let settledByChen = 0; // 陳噗付給廖噗的結算金額
+
+            let totalExp = 0; // 用於分類圓餅圖 (不含結清)
             let catStats = {};
 
             Store.state.expenses.forEach(rawItem => {
                 const item = parseItem(rawItem, '', Store.state.analysisMonth);
                 
                 if (item.isSameMonth && !item.isIncome) {
-                    totalExp += item.absPrice;
-                    catStats[item.cat] = (catStats[item.cat] || 0) + item.absPrice;
-                    
-                    // 只有共用的部分才算進結算
-                    if (item.person === '噗噗') {
-                        if (item.payer === '廖噗') sharedPaidByLiao += item.absPrice;
-                        if (item.payer === '陳噗') sharedPaidByChen += item.absPrice;
+                    if (item.cat === '結清') {
+                        if (item.payer === '廖噗') settledByLiao += item.absPrice;
+                        if (item.payer === '陳噗') settledByChen += item.absPrice;
+                    } else {
+                        totalExp += item.absPrice;
+                        catStats[item.cat] = (catStats[item.cat] || 0) + item.absPrice;
+                        
+                        // 計算各種代墊與共用
+                        if (item.person === '噗噗') {
+                            if (item.payer === '廖噗') sharedPaidByLiao += item.absPrice;
+                            if (item.payer === '陳噗') sharedPaidByChen += item.absPrice;
+                        } else if (item.person === '廖噗' && item.payer === '陳噗') {
+                            liaoPersonalPaidByChen += item.absPrice;
+                        } else if (item.person === '陳噗' && item.payer === '廖噗') {
+                            chenPersonalPaidByLiao += item.absPrice;
+                        }
                     }
                 }
             });
 
-            // 結算核心邏輯
-            const sharedTotal = sharedPaidByLiao + sharedPaidByChen;
-            const half = Math.round(sharedTotal / 2);
+            // 結算核心邏輯：計算廖噗的淨餘額 (正數代表廖噗該收錢，負數代表廖噗該給錢)
+            // 1. 廖噗為共用付的錢 (應收回一半)
+            // 2. 陳噗為共用付的錢 (廖噗應付出一半)
+            // 3. 廖噗為陳噗代墊的個人花費 (應收回全額)
+            // 4. 陳噗為廖噗代墊的個人花費 (應付出全額)
+            // 5. 已經發生的結算紀錄 (Chen結算給Liao -> 減少Liao的應收款)
+            let liaoBalance = (sharedPaidByLiao / 2) - (sharedPaidByChen / 2) 
+                            + chenPersonalPaidByLiao - liaoPersonalPaidByChen 
+                            - settledByChen + settledByLiao;
             
-            document.getElementById('dash-liao-paid').innerText = `$${sharedPaidByLiao.toLocaleString()}`;
-            document.getElementById('dash-chen-paid').innerText = `$${sharedPaidByChen.toLocaleString()}`;
-            document.getElementById('settlement-sub').innerText = `共用總額 $${sharedTotal.toLocaleString()} (每人應分攤 $${half.toLocaleString()})`;
+            liaoBalance = Math.round(liaoBalance);
 
-            const netEl = document.getElementById('settlement-text');
-            if (sharedTotal === 0) {
-                netEl.innerText = "目前無共用花費";
-                netEl.style.color = "var(--text-muted)";
+            document.getElementById('dash-liao-paid').innerText = `$${(sharedPaidByLiao + chenPersonalPaidByLiao).toLocaleString()}`;
+            document.getElementById('dash-chen-paid').innerText = `$${(sharedPaidByChen + liaoPersonalPaidByChen).toLocaleString()}`;
+
+            const cardEl = document.getElementById('settlement-card');
+            
+            if (sharedPaidByLiao === 0 && sharedPaidByChen === 0 && chenPersonalPaidByLiao === 0 && liaoPersonalPaidByChen === 0 && settledByLiao === 0 && settledByChen === 0) {
+                cardEl.innerHTML = `
+                    <span class="dc-title">結算結果</span>
+                    <div class="dc-val net" style="color: var(--text-muted);">目前無任何帳目產生</div>
+                `;
+            } else if (liaoBalance === 0) {
+                cardEl.innerHTML = `
+                    <span class="dc-title">結算結果</span>
+                    <div class="dc-val net" style="color: var(--income-color);">帳目已完全結清！🎉</div>
+                `;
+            } else if (liaoBalance > 0) {
+                cardEl.innerHTML = `
+                    <span class="dc-title">結算結果 (陳噗應付款)</span>
+                    <div class="dc-val net">👦🏻 陳噗 <span style="font-size:16px; color:var(--text-muted);">給</span> 👩🏻 廖噗<br>$${liaoBalance.toLocaleString()}</div>
+                    <button class="btn-settle" onclick="settleDebt(${liaoBalance}, '陳噗')">✅ 一鍵結清 (陳噗已還款)</button>
+                `;
             } else {
-                const liaoBalance = sharedPaidByLiao - half;
-                const chenBalance = sharedPaidByChen - half;
-
-                if (liaoBalance > 0) {
-                    netEl.innerHTML = `👦🏻 陳噗 <span style="font-size:16px; color:#8E8E93; font-weight:600;">應給</span> 👩🏻 廖噗<br>$${liaoBalance.toLocaleString()}`;
-                    netEl.style.color = "var(--primary)";
-                } else if (chenBalance > 0) {
-                    netEl.innerHTML = `👩🏻 廖噗 <span style="font-size:16px; color:#8E8E93; font-weight:600;">應給</span> 👦🏻 陳噗<br>$${chenBalance.toLocaleString()}`;
-                    netEl.style.color = "var(--primary)";
-                } else {
-                    netEl.innerText = "帳目已完全結清！🎉";
-                    netEl.style.color = "var(--income-color)";
-                }
+                const absBalance = Math.abs(liaoBalance);
+                cardEl.innerHTML = `
+                    <span class="dc-title">結算結果 (廖噗應付款)</span>
+                    <div class="dc-val net">👩🏻 廖噗 <span style="font-size:16px; color:var(--text-muted);">給</span> 👦🏻 陳噗<br>$${absBalance.toLocaleString()}</div>
+                    <button class="btn-settle" onclick="settleDebt(${absBalance}, '廖噗')">✅ 一鍵結清 (廖噗已還款)</button>
+                `;
             }
 
             // 分類排行
@@ -737,6 +754,29 @@
             document.getElementById('cat-chart-container').innerHTML = catHtml;
         }
 
+        async function settleDebt(amount, payer) {
+            if(!confirm(`確定 ${payer} 已經還款 $${amount} 了嗎？\n(這將會新增一筆結清紀錄)`)) return;
+            
+            const newId = Date.now().toString();
+            const newExpenseObj = { 
+                id: newId, 
+                date: Store.state.date, // 使用當前首頁選取的日期作為還款日
+                cat: '結清', 
+                name: `【結清|${payer}】結算還款`, 
+                price: amount 
+            };
+            
+            Store.updateExpenses([...Store.state.expenses, newExpenseObj]);
+            renderAnalysis();
+            showToast(`已成功記錄 ${payer} 的還款！`);
+
+            try {
+                const params = new URLSearchParams({ action: 'add', ...newExpenseObj });
+                await fetch(SCRIPT_URL, { method: 'POST', body: params });
+                fetchExpenses();
+            } catch (err) { showToast('背景同步失敗，已存於本機', 'error'); }
+        }
+
         async function fetchExpenses() {
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=read&t=${Date.now()}`);
@@ -761,14 +801,11 @@
             
             let finalName = baseName;
             
-            // 標籤組合邏輯：若為支出，依據不同對象組合字串
+            // 標籤組合邏輯：若為支出，一律使用 【消費對象|代墊人】 格式儲存
             if (!isInc) {
-                if (Store.state.person === '噗噗') {
-                    // 共用的話，把代墊人寫進標籤中
-                    finalName = `【噗噗|${Store.state.payer}】${baseName}`;
-                } else if (Store.state.person) {
-                    finalName = `【${Store.state.person}】${baseName}`;
-                }
+                finalName = `【${Store.state.person}|${Store.state.payer}】${baseName}`;
+            } else {
+                finalName = `【${Store.state.person}】${baseName}`; // 收入依然是個人
             }
             
             let finalPrice = isInc ? -Math.abs(Math.round(inputPrice)) : Math.abs(Math.round(inputPrice));
@@ -794,6 +831,7 @@
             const original = [...Store.state.expenses]; 
             Store.updateExpenses(Store.state.expenses.filter(item => String(item.id) !== String(id)));
             renderExpenses(); 
+            if(document.getElementById('view-analysis').classList.contains('active')) renderAnalysis();
 
             try { 
                 await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ action: 'delete', id: String(id) }) }); 
