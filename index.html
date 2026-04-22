@@ -111,11 +111,6 @@
         .budget-track { height: 6px; background: rgba(255,255,255,0.2); border-radius: 99px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);}
         .budget-fill { height: 100%; width: 0%; background: var(--bg-color); border-radius: 99px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease; }
 
-        .personal-totals { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2); position: relative; z-index: 2; }
-        .p-tot { display: flex; flex-direction: column; gap: 4px; }
-        .p-tot span { font-size: 11px; opacity: 0.9; font-weight: 600; }
-        .p-tot strong { font-size: 18px; font-weight: 800; }
-
         .date-picker-wrapper { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow-card); display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border-color); }
         .date-picker-wrapper input { font-size: 16px; font-weight: 600; color: var(--text-main); width: 100%; background: transparent; }
 
@@ -238,17 +233,6 @@
                         <div class="budget-fill" id="budget-fill"></div>
                     </div>
                 </div>
-
-                <div class="personal-totals">
-                    <div class="p-tot">
-                        <span>👩🏻 廖噗 (含共用均分)</span>
-                        <strong id="total-p2">$0</strong>
-                    </div>
-                    <div class="p-tot">
-                        <span>👦🏻 陳噗 (含共用均分)</span>
-                        <strong id="total-p3">$0</strong>
-                    </div>
-                </div>
             </div>
 
             <div class="date-picker-wrapper">
@@ -321,9 +305,13 @@
                     <span class="dc-title">👦🏻 陳噗</span>
                     <div class="dc-val exp" id="analysis-chen-spend">$0</div>
                 </div>
+                <div class="dash-card full" style="margin-bottom: 0;">
+                    <span class="dc-title">當月總支出 (兩人合計)</span>
+                    <div class="dc-val net" id="analysis-total-spend">$0</div>
+                </div>
             </div>
 
-            <h3 class="section-title">整體支出分類排行 (不含還款紀錄)</h3>
+            <h3 class="section-title">當月支出分類排行</h3>
             <div class="chart-section" id="cat-chart-container">
                 </div>
         </section>
@@ -372,8 +360,8 @@
                 budget: parseInt(localStorage.getItem('monthly_budget')) || 15000,
                 date: '',           
                 analysisMonth: '',  
-                person: '噗噗',   // 預設共用
-                payer: '廖噗',    // 預設代墊人
+                person: '噗噗',   
+                payer: '廖噗',    
                 category: '交通',
                 recordType: 'expense' 
             },
@@ -441,16 +429,16 @@
             if (isInc) {
                 expBtn.classList.remove('active');
                 incBtn.classList.add('active');
-                sharedBtn.style.display = 'none'; // 收入時隱藏共用
-                payerContainer.classList.remove('active'); // 收入時隱藏代墊選項
+                sharedBtn.style.display = 'none'; 
+                payerContainer.classList.remove('active'); 
                 if(Store.state.person === '噗噗') {
                     selectPerson('廖噗', document.getElementById('btn-person-liao'));
                 }
             } else {
                 incBtn.classList.remove('active');
                 expBtn.classList.add('active');
-                sharedBtn.style.display = 'block'; // 支出時顯示共用
-                payerContainer.classList.add('active'); // 支出時顯示代墊選項
+                sharedBtn.style.display = 'block'; 
+                payerContainer.classList.add('active'); 
             }
             
             document.getElementById('cat-expense-grid').style.display = isInc ? 'none' : 'grid';
@@ -527,7 +515,6 @@
             setTimeout(() => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
-        // 解析資料核心 (包含判斷是否為同月、萃取記錄對象與代墊人)
         function parseItem(item, targetDateStr, targetMonthStr) {
             const sheetDate = String(item.date).trim();
             const rawPrice = parseFloat(item.price) || 0;
@@ -558,7 +545,6 @@
             let payer = '未知';
             let displayName = safeName;
             
-            // 標籤格式：【消費對象|代墊人】名稱
             const tagMatch = safeName.match(/^【(.*?)】(.*)/);
             if (tagMatch) {
                 const fullTag = tagMatch[1];
@@ -581,8 +567,6 @@
             listEl.innerHTML = '';
             
             let monthlyShared = 0;
-            let monthlyP2 = 0; // 廖噗個人
-            let monthlyP3 = 0; // 陳噗個人
             const selectedDayItems = [];
 
             Store.state.expenses.forEach(rawItem => {
@@ -590,8 +574,6 @@
                 
                 if (item.isSameMonth && !item.isIncome && item.cat !== '結清') {
                     if (item.person === '噗噗') monthlyShared += item.absPrice;
-                    else if (item.person === '廖噗') monthlyP2 += item.absPrice;
-                    else if (item.person === '陳噗') monthlyP3 += item.absPrice;
                 }
                 if (item.isSameDay) selectedDayItems.push(item);
             });
@@ -643,13 +625,7 @@
                 });
             }
             
-            // 記帳首頁：個人卡片顯示 (個人當月消費 + 共用均分)
-            const actualP2 = monthlyP2 + (monthlyShared / 2);
-            const actualP3 = monthlyP3 + (monthlyShared / 2);
-            
             document.getElementById('total-shared').innerText = `NT$ ${monthlyShared.toLocaleString()}`;
-            document.getElementById('total-p2').innerText = `$${Math.round(actualP2).toLocaleString()}`;
-            document.getElementById('total-p3').innerText = `$${Math.round(actualP3).toLocaleString()}`;
             
             let currentBudget = Store.state.budget;
             document.getElementById('budget-total-label').innerText = `/ ${(currentBudget/1000).toFixed(1).replace('.0','')}k 預算`;
@@ -674,8 +650,8 @@
 
         function renderAnalysis() {
             let monthlyShared = 0;
-            let monthlyP2 = 0; // 廖噗個人
-            let monthlyP3 = 0; // 陳噗個人
+            let monthlyP2 = 0; 
+            let monthlyP3 = 0; 
             let totalExp = 0; 
             let catStats = {};
 
@@ -692,12 +668,12 @@
                 }
             });
 
-            // 當月實際花費 (個人 + 共用均分)
             const actualLiao = Math.round(monthlyP2 + (monthlyShared / 2));
             const actualChen = Math.round(monthlyP3 + (monthlyShared / 2));
 
             document.getElementById('analysis-liao-spend').innerText = `$${actualLiao.toLocaleString()}`;
             document.getElementById('analysis-chen-spend').innerText = `$${actualChen.toLocaleString()}`;
+            document.getElementById('analysis-total-spend').innerText = `$${totalExp.toLocaleString()}`;
 
             let catHtml = '';
             let sortedCats = Object.keys(catStats).sort((a,b) => catStats[b] - catStats[a]);
@@ -722,20 +698,18 @@
             document.getElementById('cat-chart-container').innerHTML = catHtml;
         }
 
-        // ====== 累積結算邏輯 (全域不分月) ======
         function renderSettlement() {
             let sharedPaidByLiao = 0;
             let sharedPaidByChen = 0;
             let chenPersonalPaidByLiao = 0;
             let liaoPersonalPaidByChen = 0;
-            let settledByLiao = 0; // 廖噗付給陳噗的結算金額
-            let settledByChen = 0; // 陳噗付給廖噗的結算金額
+            let settledByLiao = 0; 
+            let settledByChen = 0; 
 
             let historyHtml = '';
             const historyList = [];
 
             Store.state.expenses.forEach(rawItem => {
-                // 不傳入月份，因此不會進行同月檢查
                 const item = parseItem(rawItem, '', '');
                 
                 if (!item.isIncome) {
@@ -744,7 +718,6 @@
                         if (item.payer === '陳噗') settledByChen += item.absPrice;
                         historyList.push(item);
                     } else {
-                        // 全域計算代墊
                         if (item.person === '噗噗') {
                             if (item.payer === '廖噗') sharedPaidByLiao += item.absPrice;
                             if (item.payer === '陳噗') sharedPaidByChen += item.absPrice;
@@ -757,7 +730,6 @@
                 }
             });
 
-            // 結算公式：廖噗淨餘額
             let liaoBalance = (sharedPaidByLiao / 2) - (sharedPaidByChen / 2) 
                             + chenPersonalPaidByLiao - liaoPersonalPaidByChen 
                             - settledByChen + settledByLiao;
@@ -791,11 +763,9 @@
                 `;
             }
 
-            // 歷史還款紀錄
             if(historyList.length === 0) {
                 historyHtml = '<div style="text-align:center; padding: 20px; color:var(--text-muted); font-weight:600;">尚無任何歷史結清紀錄</div>';
             } else {
-                // 反轉陣列，讓最新紀錄排在前面
                 historyList.reverse().forEach(item => {
                     historyHtml += `
                     <div class="h-item">
@@ -817,15 +787,12 @@
         }
 
         async function settleDebt(amount, payer) {
-            // 增加對話框詢問是誰操作的，以此留下紀錄
             const operator = prompt(`確定要記錄「${payer}」已經還款 $${amount} 嗎？\n\n請問是誰按下這個結清按鈕的？\n(請輸入 廖噗 或 陳噗，以此署名記錄)`, payer);
-            if (!operator) return; // 使用者按取消
+            if (!operator) return; 
             
             const finalOperator = operator.includes('廖') ? '廖噗' : (operator.includes('陳') ? '陳噗' : operator);
 
             const newId = Date.now().toString();
-            
-            // 使用系統當天日期作為還款日
             const today = new Date();
             const localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
 
@@ -870,14 +837,12 @@
             
             let baseName = nameEl.value.trim() || Store.state.category;
             let isInc = Store.state.recordType === 'income';
-            
             let finalName = baseName;
             
-            // 標籤組合邏輯：若為支出，一律使用 【消費對象|代墊人】 格式儲存
             if (!isInc) {
                 finalName = `【${Store.state.person}|${Store.state.payer}】${baseName}`;
             } else {
-                finalName = `【${Store.state.person}】${baseName}`; // 收入僅綁定個人
+                finalName = `【${Store.state.person}】${baseName}`; 
             }
             
             let finalPrice = isInc ? -Math.abs(Math.round(inputPrice)) : Math.abs(Math.round(inputPrice));
