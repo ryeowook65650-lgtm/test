@@ -16,9 +16,6 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-        /* =========================================
-           1. 現代原生 App 變數設定 (極簡莫蘭迪/低飽和色票)
-           ========================================= */
         :root {
             --bg-color: #F2F0EB;       
             --card-bg: #FFFFFF;        
@@ -53,9 +50,6 @@
         button { cursor: pointer; transition: transform 0.15s ease, opacity 0.15s ease; }
         button:active { transform: scale(0.95); opacity: 0.8; }
 
-        /* =========================================
-           2. 頂部狀態列 (Header)
-           ========================================= */
         .app-header {
             position: sticky; top: 0; z-index: 100;
             background: rgba(242, 240, 235, 0.85); 
@@ -70,9 +64,6 @@
         .header-actions { display: flex; align-items: center; gap: 8px; }
         .refresh-fab { background: var(--card-bg); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-card); color: var(--primary); font-size: 18px; border: 1px solid var(--border-color); }
 
-        /* =========================================
-           3. 底部導覽列 (Bottom Tab Bar)
-           ========================================= */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -85,16 +76,10 @@
         .tab-btn.active { color: var(--primary); }
         .tab-btn.active i { transform: translateY(-2px); }
 
-        /* =========================================
-           4. 視圖容器 (Pages)
-           ========================================= */
         .view-container { display: none; padding: 0 20px; animation: fadeIn 0.3s ease forwards; }
         .view-container.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* =========================================
-           5. 卡片與共用元件
-           ========================================= */
         .balance-card {
             background: linear-gradient(135deg, #7A8B8A 0%, #51605F 100%);
             border-radius: var(--radius-lg); padding: 20px 24px; color: #FFF; margin-top: 10px; margin-bottom: 24px;
@@ -102,10 +87,8 @@
         }
         .balance-card::after { content: ''; position: absolute; right: -20px; top: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.06); border-radius: 50%; pointer-events: none;}
         
-        .b-title { font-size: 13px; font-weight: 600; opacity: 0.85; margin-bottom: 12px; display: flex; justify-content: space-between; position: relative; z-index: 2; }
-        .b-amount { font-size: 40px; font-weight: 800; margin: 0 0 4px; letter-spacing: -1px; position: relative; z-index: 2;}
+        .b-title { font-size: 13px; font-weight: 600; opacity: 0.85; display: flex; justify-content: space-between; position: relative; z-index: 2; margin-bottom: 16px; }
 
-        /* 精緻個人進度條 */
         .mini-budget-block { display: flex; flex-direction: column; gap: 6px; position: relative; z-index: 2;}
         .mb-header { display: flex; justify-content: space-between; align-items: flex-end; }
         .mb-name { font-size: 13px; font-weight: 600; opacity: 0.9; }
@@ -179,6 +162,7 @@
         .dash-card.full { grid-column: span 2; background: linear-gradient(135deg, #FFFFFF 0%, #FAFAFA 100%); border: 1px solid rgba(0, 0, 0, 0.05);}
         .dc-title { font-size: 12px; color: var(--text-muted); font-weight: 800; margin-bottom: 8px; display: block; }
         .dc-val { font-size: 22px; font-weight: 800; color: var(--text-main); }
+        .dc-val.exp { color: var(--text-main); }
         .dc-val.net { font-size: 24px; color: var(--text-main); margin: 8px 0; line-height: 1.4; }
         .dc-val.positive { color: var(--income-color); }
         .dc-val.negative { color: var(--deficit-color); }
@@ -220,7 +204,8 @@
             
             <div class="balance-card">
                 <div class="b-title">
-                    <span>當月個人花費進度 (含共用分攤)</span>
+                    <span>當月個人花費進度</span>
+                    <span style="font-weight: 400; opacity: 0.8;">含共用均分</span>
                 </div>
                 
                 <div class="mini-budget-block">
@@ -388,7 +373,7 @@
         const Store = {
             state: {
                 expenses: getSafeStorage('cached_expenses', []),
-                budgets: { '廖噗': 15000, '陳噗': 15000 },
+                budgets: getSafeStorage('cached_budgets', { '廖噗': 15000, '陳噗': 15000 }),
                 date: '',           
                 analysisMonth: '',  
                 person: '噗噗',   
@@ -399,6 +384,10 @@
             updateExpenses(newData) {
                 this.state.expenses = newData;
                 localStorage.setItem('cached_expenses', JSON.stringify(newData));
+            },
+            updateBudgets(newBudgets) {
+                this.state.budgets = newBudgets;
+                localStorage.setItem('cached_budgets', JSON.stringify(newBudgets));
             }
         };
 
@@ -411,8 +400,12 @@
             const dateInput = document.getElementById('expense-date');
             const monthInput = document.getElementById('analysis-month');
             const today = new Date();
-            const localDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-            const localMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            
+            const localDate = `${yyyy}-${mm}-${dd}`;
+            const localMonth = `${yyyy}-${mm}`;
             
             dateInput.value = localDate;
             monthInput.value = localMonth;
@@ -422,7 +415,10 @@
             dateInput.addEventListener('change', (e) => { Store.state.date = e.target.value; renderExpenses(); });
             monthInput.addEventListener('change', (e) => { Store.state.analysisMonth = e.target.value; renderAnalysis(); });
             
-            try { renderExpenses(); if (navigator.onLine) fetchExpenses(); } catch (e) { console.error(e); }
+            try { 
+                renderExpenses(); 
+                if (navigator.onLine) fetchExpenses(); 
+            } catch (e) { console.error(e); }
         });
 
         function switchTab(tabId) {
@@ -449,6 +445,7 @@
             const incBtn = document.getElementById('btn-type-inc');
             const sharedBtn = document.getElementById('btn-person-shared');
             const payerContainer = document.getElementById('payer-container');
+            
             if (isInc) {
                 expBtn.classList.remove('active');
                 incBtn.classList.add('active');
@@ -461,17 +458,21 @@
                 sharedBtn.style.display = 'block'; 
                 payerContainer.classList.add('active'); 
             }
+            
             document.getElementById('cat-expense-grid').style.display = isInc ? 'none' : 'grid';
             document.getElementById('cat-income-grid').style.display = isInc ? 'grid' : 'none';
             document.getElementById('cat-title').innerText = isInc ? '選擇收入來源' : '選擇支出分類';
+
             Store.state.category = isInc ? '薪水' : '房租/電費';
             const grids = document.querySelectorAll(isInc ? '#cat-income-grid .bento-box' : '#cat-expense-grid .bento-box');
             grids.forEach(box => box.classList.remove('active'));
             if(grids.length > 0) grids[0].classList.add('active');
+
             const wrapper = document.getElementById('input-wrapper');
             const sym = document.getElementById('curr-symbol');
             const btn = document.getElementById('submit-btn');
             const input = document.getElementById('item-price');
+            
             if (isInc) {
                 wrapper.style.background = 'rgba(113, 135, 118, 0.12)';
                 sym.style.color = 'var(--income-color)';
@@ -493,9 +494,11 @@
             Store.state.person = person;
             document.querySelectorAll('#person-segment .seg-btn').forEach(btn => btn.classList.remove('active'));
             el.classList.add('active');
+
             const payerAA = document.getElementById('payer-aa');
-            if (person === '噗噗') payerAA.style.display = 'block';
-            else {
+            if (person === '噗噗') {
+                payerAA.style.display = 'block';
+            } else {
                 payerAA.style.display = 'none';
                 if (Store.state.payer === '各自付') {
                     const selfBtn = person === '廖噗' ? document.getElementById('payer-liao') : document.getElementById('payer-chen');
@@ -524,13 +527,16 @@
                 const num = parseInt(input.replace(/[^\d]/g, ''), 10);
                 if (!isNaN(num) && num > 0) {
                     Store.state.budgets[person] = num;
+                    Store.updateBudgets(Store.state.budgets); // 更新本機儲存
                     renderExpenses();
-                    showToast('正在同步預算至雲端...');
+                    showToast('預算已更新，正在同步至雲端...');
                     try {
                         const params = new URLSearchParams({ action: 'setBudget', person: person, budget: num });
                         await fetch(SCRIPT_URL, { method: 'POST', body: params });
                         showToast('預算同步成功！');
-                    } catch(err) { showToast('預算同步失敗，僅更新本機', 'error'); }
+                    } catch(err) {
+                        showToast('同步失敗，僅更新本機', 'error');
+                    }
                 } else { showToast('請輸入有效數字', 'error'); }
             }
         }
@@ -550,6 +556,7 @@
             const rawPrice = parseFloat(item.price) || 0;
             const isIncome = rawPrice < 0; 
             const absPrice = Math.round(Math.abs(rawPrice));
+            
             let isSameMonth = false, isSameDay = false;
             let d = new Date(sheetDate);
             let isValidDate = !isNaN(d.getTime());
@@ -580,7 +587,10 @@
         function renderExpenses() {
             const listEl = document.getElementById('expense-list');
             listEl.innerHTML = '';
-            let monthlyShared = 0, monthlyP2 = 0, monthlyP3 = 0;
+            
+            let monthlyShared = 0;
+            let monthlyP2 = 0; // 廖噗
+            let monthlyP3 = 0; // 陳噗
             const selectedDayItems = [];
             
             Store.state.expenses.forEach(rawItem => {
@@ -593,13 +603,15 @@
                 if (item.isSameDay) selectedDayItems.push(item);
             });
 
-            if (selectedDayItems.length === 0) listEl.innerHTML = `<div style="text-align:center; padding: 40px 20px; color: var(--text-muted); font-weight:600;">本日尚無紀錄</div>`;
-            else {
+            if (selectedDayItems.length === 0) {
+                listEl.innerHTML = `<div style="text-align:center; padding: 40px 20px; color: var(--text-muted); font-weight:600;">本日尚無紀錄</div>`;
+            } else {
                 selectedDayItems.forEach(item => {
                     const icon = item.cat === '結清' ? 'ph-handshake' : (EMOJI_MAP[item.cat] || 'ph-ticket');
                     let incClass = '', sign = '';
                     if (item.cat === '結清') incClass = 'settled';
                     else if (item.isIncome) { incClass = 'inc'; sign = '+'; }
+                    
                     let personTagHtml = '';
                     if (item.cat === '結清') personTagHtml = `<span class="h-tag settled">還款紀錄</span>`;
                     else if (!item.isIncome) {
@@ -608,41 +620,79 @@
                             personTagHtml = `<span class="h-tag shared">共用 (${payerText})</span>`;
                         } else if (item.person !== item.payer) {
                             personTagHtml = `<span class="h-tag alert">${item.person} (${item.payer}付)</span>`;
-                        } else personTagHtml = `<span class="h-tag">${item.person}</span>`;
+                        } else {
+                            personTagHtml = `<span class="h-tag">${item.person}</span>`;
+                        }
                     } else personTagHtml = `<span class="h-tag">${item.person}</span>`;
-                    listEl.innerHTML += `<div class="h-item"><div class="h-left"><div class="h-icon ${incClass}"><i class="ph-fill ${icon}"></i></div><div class="h-info"><h4>${item.displayName} ${personTagHtml}</h4><span class="h-cat">${item.cat}</span></div></div><div class="h-right"><div class="h-price ${incClass}">${sign}$${item.absPrice}</div><button class="h-del" onclick="deleteExpense('${item.id}')"><i class="ph-bold ph-trash"></i></button></div></div>`;
+                    
+                    listEl.innerHTML += `
+                    <div class="h-item">
+                        <div class="h-left">
+                            <div class="h-icon ${incClass}"><i class="ph-fill ${icon}"></i></div>
+                            <div class="h-info">
+                                <h4>${item.displayName} ${personTagHtml}</h4>
+                                <span class="h-cat">${item.cat}</span>
+                            </div>
+                        </div>
+                        <div class="h-right">
+                            <div class="h-price ${incClass}">${sign}$${item.absPrice}</div>
+                            <button class="h-del" onclick="deleteExpense('${item.id}')"><i class="ph-bold ph-trash"></i></button>
+                        </div>
+                    </div>`;
                 });
             }
 
-            const actualLiao = monthlyP2 + (monthlyShared / 2), actualChen = monthlyP3 + (monthlyShared / 2);
+            // 更新雙人各自的迷你進度條
+            const actualLiao = monthlyP2 + (monthlyShared / 2);
+            const actualChen = monthlyP3 + (monthlyShared / 2);
+
             document.getElementById('spend-liao').innerText = `$${Math.round(actualLiao).toLocaleString()}`;
             document.getElementById('spend-chen').innerText = `$${Math.round(actualChen).toLocaleString()}`;
 
-            let bLiao = Store.state.budgets['廖噗'] || 15000, bChen = Store.state.budgets['陳噗'] || 15000;
-            document.getElementById('budget-liao-lbl').innerText = `${(bLiao/1000).toFixed(1).replace('.0','')}k`;
-            document.getElementById('budget-chen-lbl').innerText = `${(bChen/1000).toFixed(1).replace('.0','')}k`;
+            let budgetLiao = Store.state.budgets['廖噗'] || 15000;
+            let budgetChen = Store.state.budgets['陳噗'] || 15000;
 
-            let pLiao = (actualLiao/bLiao)*100, pChen = (actualChen/bChen)*100;
-            const fillL = document.getElementById('fill-liao'), fillC = document.getElementById('fill-chen');
-            fillL.style.width = `${Math.min(pLiao, 100)}%`; fillC.style.width = `${Math.min(pChen, 100)}%`;
-            
-            document.getElementById('rem-liao').innerText = bLiao - actualLiao >= 0 ? `剩餘 $${Math.round(bLiao-actualLiao).toLocaleString()}` : `超支 $${Math.round(actualLiao-bLiao).toLocaleString()}`;
-            document.getElementById('rem-chen').innerText = bChen - actualChen >= 0 ? `剩餘 $${Math.round(bChen-actualChen).toLocaleString()}` : `超支 $${Math.round(actualChen-bChen).toLocaleString()}`;
-            
-            fillL.style.background = pLiao > 85 ? '#EBD9D9' : 'var(--bg-color)';
-            fillC.style.background = pChen > 85 ? '#EBD9D9' : 'var(--bg-color)';
-            
-            let currentTotalShared = 0;
-            Store.state.expenses.forEach(e => {
-                const item = parseItem(e, Store.state.date, Store.state.date.substring(0,7));
-                if(item.isSameMonth && !item.isIncome && item.person === '噗噗' && item.cat !== '結清') currentTotalShared += item.absPrice;
-            });
-            document.getElementById('total-shared').innerText = `NT$ ${currentTotalShared.toLocaleString()}`;
+            document.getElementById('budget-liao-lbl').innerText = `${(budgetLiao/1000).toFixed(1).replace('.0','')}k`;
+            document.getElementById('budget-chen-lbl').innerText = `${(budgetChen/1000).toFixed(1).replace('.0','')}k`;
+
+            // 廖噗進度條計算
+            let pctLiao = (actualLiao / budgetLiao) * 100;
+            let remLiao = budgetLiao - actualLiao;
+            const fillLiao = document.getElementById('fill-liao');
+            const remLblLiao = document.getElementById('rem-liao');
+            fillLiao.style.width = `${Math.min(pctLiao, 100)}%`;
+            if (remLiao >= 0) { 
+                remLblLiao.innerText = `剩餘 $${Math.round(remLiao).toLocaleString()}`; 
+                remLblLiao.style.color = 'inherit'; 
+                fillLiao.style.background = pctLiao > 85 ? '#EBD9D9' : 'var(--bg-color)'; 
+            } else { 
+                remLblLiao.innerText = `超支 $${Math.round(Math.abs(remLiao)).toLocaleString()}`; 
+                remLblLiao.style.color = '#EBD9D9'; 
+                fillLiao.style.background = '#EBD9D9'; 
+            }
+
+            // 陳噗進度條計算
+            let pctChen = (actualChen / budgetChen) * 100;
+            let remChen = budgetChen - actualChen;
+            const fillChen = document.getElementById('fill-chen');
+            const remLblChen = document.getElementById('rem-chen');
+            fillChen.style.width = `${Math.min(pctChen, 100)}%`;
+            if (remChen >= 0) { 
+                remLblChen.innerText = `剩餘 $${Math.round(remChen).toLocaleString()}`; 
+                remLblChen.style.color = 'inherit'; 
+                fillChen.style.background = pctChen > 85 ? '#EBD9D9' : 'var(--bg-color)'; 
+            } else { 
+                remLblChen.innerText = `超支 $${Math.round(Math.abs(remChen)).toLocaleString()}`; 
+                remLblChen.style.color = '#EBD9D9'; 
+                fillChen.style.background = '#EBD9D9'; 
+            }
         }
 
         function renderAnalysis() {
             let monthlyShared = 0, monthlyP2 = 0, monthlyP3 = 0, totalExp = 0;
-            let monthlyIncLiao = 0, monthlyIncChen = 0, catStats = {};
+            let monthlyIncLiao = 0, monthlyIncChen = 0;
+            let catStats = {};
+
             Store.state.expenses.forEach(rawItem => {
                 const item = parseItem(rawItem, '', Store.state.analysisMonth);
                 if (item.isSameMonth && item.cat !== '結清') {
@@ -650,32 +700,46 @@
                         if (item.person === '廖噗') monthlyIncLiao += item.absPrice;
                         if (item.person === '陳噗') monthlyIncChen += item.absPrice;
                     } else {
-                        totalExp += item.absPrice; catStats[item.cat] = (catStats[item.cat] || 0) + item.absPrice;
+                        totalExp += item.absPrice; 
+                        catStats[item.cat] = (catStats[item.cat] || 0) + item.absPrice;
                         if (item.person === '噗噗') monthlyShared += item.absPrice;
                         else if (item.person === '廖噗') monthlyP2 += item.absPrice;
                         else if (item.person === '陳噗') monthlyP3 += item.absPrice;
                     }
                 }
             });
-            const actualLiao = Math.round(monthlyP2 + (monthlyShared / 2)), actualChen = Math.round(monthlyP3 + (monthlyShared / 2));
-            const netLiao = monthlyIncLiao - actualLiao, netChen = monthlyIncChen - actualChen;
-            
-            document.getElementById('analysis-liao-net').innerText = `${netLiao>=0?'+':''}$${netLiao.toLocaleString()}`;
-            document.getElementById('analysis-liao-net').className = `dc-val net ${netLiao>=0?'positive':'negative'}`;
+
+            const actualLiao = Math.round(monthlyP2 + (monthlyShared / 2));
+            const actualChen = Math.round(monthlyP3 + (monthlyShared / 2));
+
+            const netLiao = monthlyIncLiao - actualLiao;
+            const netChen = monthlyIncChen - actualChen;
+
+            // Liao Update
+            const liaoNetEl = document.getElementById('analysis-liao-net');
+            liaoNetEl.innerText = `${netLiao >= 0 ? '+' : ''}$${netLiao.toLocaleString()}`;
+            liaoNetEl.className = `dc-val net ${netLiao >= 0 ? 'positive' : 'negative'}`;
             document.getElementById('analysis-liao-inc').innerText = `$${monthlyIncLiao.toLocaleString()}`;
             document.getElementById('analysis-liao-spend').innerText = `$${actualLiao.toLocaleString()}`;
 
-            document.getElementById('analysis-chen-net').innerText = `${netChen>=0?'+':''}$${netChen.toLocaleString()}`;
-            document.getElementById('analysis-chen-net').className = `dc-val net ${netChen>=0?'positive':'negative'}`;
+            // Chen Update
+            const chenNetEl = document.getElementById('analysis-chen-net');
+            chenNetEl.innerText = `${netChen >= 0 ? '+' : ''}$${netChen.toLocaleString()}`;
+            chenNetEl.className = `dc-val net ${netChen >= 0 ? 'positive' : 'negative'}`;
             document.getElementById('analysis-chen-inc').innerText = `$${monthlyIncChen.toLocaleString()}`;
             document.getElementById('analysis-chen-spend').innerText = `$${actualChen.toLocaleString()}`;
 
-            let catHtml = ''; let sortedCats = Object.keys(catStats).sort((a,b) => catStats[b] - catStats[a]);
-            if(sortedCats.length === 0) catHtml = '<div style="text-align:center; color:var(--text-muted); font-size:13px;">本月尚無支出資料</div>';
-            else sortedCats.forEach(cat => {
-                let val = catStats[cat], pct = totalExp === 0 ? 0 : Math.round((val / totalExp) * 100), icon = EMOJI_MAP[cat] || 'ph-ticket';
-                catHtml += `<div class="chart-row"><div class="cr-top"><div class="cr-name"><i class="ph-fill ${icon}"></i> ${cat}</div><div class="cr-val">$${val.toLocaleString()}</div></div><div class="cr-track"><div class="cr-fill" style="width: ${pct}%; opacity: ${Math.max(0.4, pct/100 + 0.2)}"></div></div></div>`;
-            });
+            let catHtml = '';
+            let sortedCats = Object.keys(catStats).sort((a,b) => catStats[b] - catStats[a]);
+            if(sortedCats.length === 0) {
+                catHtml = '<div style="text-align:center; color:var(--text-muted); font-size:13px;">本月尚無支出資料</div>';
+            } else {
+                sortedCats.forEach(cat => {
+                    let val = catStats[cat], pct = totalExp === 0 ? 0 : Math.round((val / totalExp) * 100);
+                    let icon = EMOJI_MAP[cat] || 'ph-ticket';
+                    catHtml += `<div class="chart-row"><div class="cr-top"><div class="cr-name"><i class="ph-fill ${icon}"></i> ${cat}</div><div class="cr-val">$${val.toLocaleString()}</div></div><div class="cr-track"><div class="cr-fill p1" style="width: ${pct}%; opacity: ${Math.max(0.4, pct/100 + 0.2)}"></div></div></div>`;
+                });
+            }
             document.getElementById('cat-chart-container').innerHTML = catHtml;
         }
 
@@ -690,27 +754,58 @@
                         if (item.payer === '陳噗') settledByChen += item.absPrice;
                         historyList.push(item);
                     } else {
-                        if (item.person === '噗噗') { if (item.payer === '廖噗') sharedPaidByLiao += item.absPrice; if (item.payer === '陳噗') sharedPaidByChen += item.absPrice; }
+                        if (item.person === '噗噗') { 
+                            if (item.payer === '廖噗') sharedPaidByLiao += item.absPrice; 
+                            if (item.payer === '陳噗') sharedPaidByChen += item.absPrice; 
+                            // 各自付不增加雙方代墊總額
+                        }
                         else if (item.person === '廖噗' && item.payer === '陳噗') chenPaidForLiao += item.absPrice;
                         else if (item.person === '陳噗' && item.payer === '廖噗') liaoPaidForChen += item.absPrice;
                     }
                 }
             });
+            
             let liaoBalance = Math.round((sharedPaidByLiao / 2) - (sharedPaidByChen / 2) + liaoPaidForChen - chenPaidForLiao - settledByChen + settledByLiao);
+            
             const cardEl = document.getElementById('global-settlement-card');
-            if (sharedPaidByLiao + sharedPaidByChen + chenPaidForLiao + liaoPaidForChen + settledByLiao + settledByChen === 0) cardEl.innerHTML = `<span class="dc-title">目前累積餘額</span><div class="dc-val net" style="color: var(--text-muted);">目前無任何帳目產生</div>`;
-            else if (liaoBalance === 0) cardEl.innerHTML = `<span class="dc-title">目前累積餘額</span><div class="dc-val net" style="color: var(--income-color);">歷史帳目已完全結清！🎉</div>`;
-            else if (liaoBalance > 0) cardEl.innerHTML = `<span class="dc-title">目前累積餘額 (陳噗應付款)</span><div class="dc-val net">🦦 陳噗 <span style="font-size:16px; color:var(--text-muted);">給</span> 🦭 廖噗<br>$${liaoBalance.toLocaleString()}</div><button class="btn-settle" onclick="settleDebt(${liaoBalance}, '陳噗')">一鍵結清 (記錄陳噗還款)</button>`;
-            else cardEl.innerHTML = `<span class="dc-title">目前累積餘額 (廖噗應付款)</span><div class="dc-val net">🦭 廖噗 <span style="font-size:16px; color:var(--text-muted);">給</span> 🦦 陳噗<br>$${Math.abs(liaoBalance).toLocaleString()}</div><button class="btn-settle" onclick="settleDebt(${Math.abs(liaoBalance)}, '廖噗')">一鍵結清 (記錄廖噗還款)</button>`;
-            if(historyList.length === 0) historyHtml = '<div style="text-align:center; padding: 20px; color:var(--text-muted); font-weight:600;">尚無歷史結清紀錄</div>';
-            else historyList.reverse().forEach(item => {
-                historyHtml += `<div class="h-item"><div class="h-left"><div class="h-icon settled"><i class="ph-fill ph-handshake"></i></div><div class="h-info"><h4>${item.displayName}</h4><span class="h-cat">${item.date}</span></div></div><div class="h-right"><div class="h-price settled">$${item.absPrice}</div><button class="h-del" onclick="deleteExpense('${item.id}')"><i class="ph-bold ph-trash"></i></button></div></div>`;
-            });
+            if (sharedPaidByLiao + sharedPaidByChen + chenPaidForLiao + liaoPaidForChen + settledByLiao + settledByChen === 0) {
+                cardEl.innerHTML = `<span class="dc-title">目前累積餘額</span><div class="dc-val net" style="color: var(--text-muted);">目前無任何帳目產生</div>`;
+            } else if (liaoBalance === 0) {
+                cardEl.innerHTML = `<span class="dc-title">目前累積餘額</span><div class="dc-val net" style="color: var(--income-color);">歷史帳目已完全結清！🎉</div>`;
+            } else if (liaoBalance > 0) {
+                cardEl.innerHTML = `<span class="dc-title">目前累積餘額 (陳噗應付款)</span><div class="dc-val net">🦦 陳噗 <span style="font-size:16px; color:var(--text-muted);">給</span> 🦭 廖噗<br>$${liaoBalance.toLocaleString()}</div><button class="btn-settle" onclick="settleDebt(${liaoBalance}, '陳噗')">一鍵結清 (記錄陳噗還款)</button>`;
+            } else {
+                const absBalance = Math.abs(liaoBalance);
+                cardEl.innerHTML = `<span class="dc-title">目前累積餘額 (廖噗應付款)</span><div class="dc-val net">🦭 廖噗 <span style="font-size:16px; color:var(--text-muted);">給</span> 🦦 陳噗<br>$${absBalance.toLocaleString()}</div><button class="btn-settle" onclick="settleDebt(${absBalance}, '廖噗')">一鍵結清 (記錄廖噗還款)</button>`;
+            }
+
+            if(historyList.length === 0) {
+                historyHtml = '<div style="text-align:center; padding: 20px; color:var(--text-muted); font-weight:600;">尚無歷史結清紀錄</div>';
+            } else {
+                historyList.reverse().forEach(item => {
+                    historyHtml += `
+                    <div class="h-item">
+                        <div class="h-left">
+                            <div class="h-icon settled"><i class="ph-fill ph-handshake"></i></div>
+                            <div class="h-info">
+                                <h4>${item.displayName}</h4>
+                                <span class="h-cat">${item.date}</span>
+                            </div>
+                        </div>
+                        <div class="h-right">
+                            <div class="h-price settled">$${item.absPrice}</div>
+                            <button class="h-del" onclick="deleteExpense('${item.id}')"><i class="ph-bold ph-trash"></i></button>
+                        </div>
+                    </div>`;
+                });
+            }
             document.getElementById('settlement-history-list').innerHTML = historyHtml;
         }
 
         function renderSavings() {
-            let totalIncLiao = 0, totalIncChen = 0, totalExpLiao = 0, totalExpChen = 0, totalShared = 0;
+            let totalIncLiao = 0, totalIncChen = 0;
+            let totalExpLiao = 0, totalExpChen = 0, totalShared = 0;
+
             Store.state.expenses.forEach(rawItem => {
                 const item = parseItem(rawItem, '', '');
                 if (item.cat !== '結清') {
@@ -724,24 +819,38 @@
                     }
                 }
             });
-            const savLiao = totalIncLiao - (totalExpLiao + totalShared/2), savChen = totalIncChen - (totalExpChen + totalShared/2);
-            document.getElementById('savings-total').innerText = `$${Math.round(savLiao + savChen).toLocaleString()}`;
-            document.getElementById('savings-liao-net').innerText = `$${Math.round(savLiao).toLocaleString()}`;
-            document.getElementById('savings-liao-net').className = `dc-val net ${savLiao>=0?'positive':'negative'}`;
-            document.getElementById('savings-chen-net').innerText = `$${Math.round(savChen).toLocaleString()}`;
-            document.getElementById('savings-chen-net').className = `dc-val net ${savChen>=0?'positive':'negative'}`;
+
+            const actualLiao = Math.round(totalExpLiao + (totalShared / 2));
+            const actualChen = Math.round(totalExpChen + (totalShared / 2));
+
+            const savingsLiao = totalIncLiao - actualLiao;
+            const savingsChen = totalIncChen - actualChen;
+            const totalSavings = savingsLiao + savingsChen;
+
+            const totalEl = document.getElementById('savings-total');
+            totalEl.innerText = `${totalSavings >= 0 ? '' : '-'}$${Math.abs(totalSavings).toLocaleString()}`;
+            
+            const liaoEl = document.getElementById('savings-liao-net');
+            liaoEl.innerText = `${savingsLiao >= 0 ? '' : '-'}$${Math.abs(savingsLiao).toLocaleString()}`;
+            liaoEl.className = `dc-val net ${savingsLiao >= 0 ? 'positive' : 'negative'}`;
+
+            const chenEl = document.getElementById('savings-chen-net');
+            chenEl.innerText = `${savingsChen >= 0 ? '' : '-'}$${Math.abs(savingsChen).toLocaleString()}`;
+            chenEl.className = `dc-val net ${savingsChen >= 0 ? 'positive' : 'negative'}`;
         }
 
         async function settleDebt(amount, payer) {
-            const operator = prompt(`確定記錄「${payer}」已還款 $${amount}？操作人署名：`, payer);
+            const operator = prompt(`確定要記錄「${payer}」已還款 $${amount}？\n請輸入操作人 (廖噗 或 陳噗) 以署名：`, payer);
             if (!operator) return;
             const finalOp = operator.includes('廖') ? '廖噗' : (operator.includes('陳') ? '陳噗' : operator);
             const newId = Date.now().toString();
             const today = new Date();
-            const localDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            const localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
             const newObj = { id: newId, date: localDate, cat: '結清', name: `【結清|${payer}】${finalOp} 操作還款確認`, price: amount };
-            Store.updateExpenses([...Store.state.expenses, newObj]); renderSettlement();
-            try { await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ action: 'add', ...newObj }) }); fetchExpenses(); } catch (err) { showToast('背景同步失敗', 'error'); }
+            Store.updateExpenses([...Store.state.expenses, newObj]);
+            renderSettlement();
+            showToast(`已成功記錄 ${payer} 的還款！`);
+            try { await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ action: 'add', ...newObj }) }); fetchExpenses(); } catch (err) { showToast('背景同步失敗，已存於本機', 'error'); }
         }
 
         async function fetchExpenses() {
@@ -750,11 +859,14 @@
                 const freshData = await res.json();
                 if (freshData.expenses) {
                     Store.updateExpenses(freshData.expenses);
-                    if (freshData.budgets) Store.state.budgets = freshData.budgets;
+                    if (freshData.budgets) Store.updateBudgets(freshData.budgets);
                     renderExpenses();
                     if(document.getElementById('view-analysis').classList.contains('active')) renderAnalysis();
                     if(document.getElementById('view-settlement').classList.contains('active')) renderSettlement();
                     if(document.getElementById('view-savings').classList.contains('active')) renderSavings();
+                } else if (Array.isArray(freshData)) {
+                    Store.updateExpenses(freshData);
+                    renderExpenses();
                 }
             } catch (err) { console.error(err); }
         }
@@ -766,18 +878,24 @@
             if (!isInc) finalName = `【${Store.state.person}|${Store.state.payer}】${baseName}`;
             else finalName = `【${Store.state.person}】${baseName}`; 
             let finalPrice = isInc ? -Math.abs(Math.round(inputPrice)) : Math.abs(Math.round(inputPrice));
-            const newId = Date.now().toString(), newObj = { id: newId, date: Store.state.date, cat: Store.state.category, name: finalName, price: finalPrice };
-            Store.updateExpenses([...Store.state.expenses, newObj]); renderExpenses();
-            nameEl.value = ''; priceEl.value = ''; priceEl.blur(); showToast(`已新增${isInc ? '收入' : '花費'}`);
-            try { await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ action: 'add', ...newObj }) }); fetchExpenses(); } catch (err) { showToast('同步失敗', 'error'); }
+            const newId = Date.now().toString();
+            const newObj = { id: newId, date: Store.state.date, cat: Store.state.category, name: finalName, price: finalPrice };
+            Store.updateExpenses([...Store.state.expenses, newObj]); 
+            renderExpenses();
+            nameEl.value = ''; priceEl.value = ''; priceEl.blur(); 
+            showToast(`已新增${isInc ? '收入' : '花費'}`);
+            try { await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ action: 'add', ...newObj }) }); fetchExpenses(); } catch (err) { showToast('同步失敗，已存於本機', 'error'); }
         }
 
         async function deleteExpense(id) {
-            if (!confirm('確定刪除此紀錄？')) return;
+            if (!confirm('確定刪除此紀錄？(後端會保留刪除日誌)')) return;
             const original = [...Store.state.expenses]; 
             Store.updateExpenses(Store.state.expenses.filter(item => String(item.id) !== String(id)));
             renderExpenses(); 
-            try { await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ action: 'delete', id: String(id) }) }); showToast('紀錄已移除'); fetchExpenses(); } catch (err) { Store.updateExpenses(original); renderExpenses(); showToast('刪除失敗', 'error'); }
+            if(document.getElementById('view-analysis').classList.contains('active')) renderAnalysis(); 
+            if(document.getElementById('view-settlement').classList.contains('active')) renderSettlement();
+            if(document.getElementById('view-savings').classList.contains('active')) renderSavings();
+            try { await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ action: 'delete', id: String(id) }) }); showToast('紀錄已從畫面移除'); fetchExpenses(); } catch (err) { Store.updateExpenses(original); renderExpenses(); showToast('刪除失敗', 'error'); }
         }
     </script>
 </body>
